@@ -115,7 +115,7 @@ class _PreJoinDeviceCheckModalState extends State<PreJoinDeviceCheckModal> {
                                 ),
                                 AppSpacing.gapH4,
                                 Text(
-                                  '100ms HD Video & Audio Engine Ready',
+                                  '100ms HD Video & Audio Ready',
                                   style: TextStyle(fontSize: 11, color: Colors.green.shade300),
                                 ),
                               ],
@@ -380,31 +380,45 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
 
                 // 2-Participant Video Grid
                 Expanded(
-                  child: Padding(
-                    padding: AppSpacing.paddingSm,
-                    child: Column(
-                      children: [
-                        // Peer Tile
-                        Expanded(
-                          child: _buildParticipantTile(
-                            user: widget.peerUser,
-                            isSelf: false,
-                            isVideoOff: false,
-                            isMuted: false,
-                          ),
+                  child: StreamBuilder<List<HMSPeer>>(
+                    stream: _hmsSdkService.peersStream,
+                    builder: (context, snapshot) {
+                      final localPeer = _hmsSdkService.localPeer;
+                      final remotePeers = _hmsSdkService.remotePeers;
+                      final remotePeer = remotePeers.isNotEmpty ? remotePeers.first : null;
+
+                      final localTrack = localPeer?.videoTrack;
+                      final remoteTrack = remotePeer?.videoTrack;
+
+                      return Padding(
+                        padding: AppSpacing.paddingSm,
+                        child: Column(
+                          children: [
+                            // Peer Tile
+                            Expanded(
+                              child: _buildParticipantTile(
+                                user: widget.peerUser,
+                                isSelf: false,
+                                isVideoOff: remoteTrack?.isMute ?? false,
+                                isMuted: remotePeer?.audioTrack?.isMute ?? false,
+                                videoTrack: remoteTrack,
+                              ),
+                            ),
+                            AppSpacing.gapV8,
+                            // Self Tile
+                            Expanded(
+                              child: _buildParticipantTile(
+                                user: widget.currentUser,
+                                isSelf: true,
+                                isVideoOff: _isVideoDisabled || (localTrack?.isMute ?? false),
+                                isMuted: _isMicMuted,
+                                videoTrack: localTrack,
+                              ),
+                            ),
+                          ],
                         ),
-                        AppSpacing.gapV8,
-                        // Self Tile
-                        Expanded(
-                          child: _buildParticipantTile(
-                            user: widget.currentUser,
-                            isSelf: true,
-                            isVideoOff: _isVideoDisabled,
-                            isMuted: _isMicMuted,
-                          ),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ),
 
@@ -553,6 +567,7 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
     required bool isSelf,
     required bool isVideoOff,
     required bool isMuted,
+    HMSVideoTrack? videoTrack,
   }) {
     final roleColor = user.role == UserRole.trainer ? AppColors.trainerPrimary : AppColors.guruPrimary;
 
@@ -564,7 +579,15 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
       ),
       child: Stack(
         children: [
-          if (!isVideoOff)
+          if (!isVideoOff && videoTrack != null)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              child: HMSVideoView(
+                track: videoTrack,
+                scaleType: ScaleType.SCALE_ASPECT_FILL,
+              ),
+            )
+          else if (!isVideoOff)
             ClipRRect(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
               child: Container(
@@ -588,7 +611,7 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
                             decoration: const BoxDecoration(color: AppColors.success, shape: BoxShape.circle),
                           ),
                           AppSpacing.gapH4,
-                          const Text('100ms Live Video Track Active', style: TextStyle(fontSize: 10, color: Colors.greenAccent)),
+                          const Text('100ms Live Video Stream Active', style: TextStyle(fontSize: 10, color: Colors.greenAccent)),
                         ],
                       ),
                     ],
@@ -692,3 +715,4 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
     );
   }
 }
+
