@@ -1,84 +1,74 @@
-# WTF Flutter Assessment ‚Äî Guru App & Trainer App (100ms + Chat)
+# WTF Assessment: Guru App (Member) & Trainer App (Trainer)
 
-A production-ready pair of coordinated Flutter applications (**Guru App** for Members and **Trainer App** for Trainers) built with local-first real-time synchronization, 100ms RTC video calling, intelligent call scheduling, interactive session logs, and an in-app DevPanel for observability.
+Dual Flutter mobile apps designed for 1-on-1 video fitness coaching and real-time memberñtrainer communication, powered by **100ms** ([100ms live documentation](https://www.100ms.live/docs)).
 
 ---
 
-## Quickstart: Build & Run
+## 1. Project Directory Layout
 
-### 1. One-Command Setup & Test
-Run the following commands to install dependencies and verify all unit tests across the monorepo:
-
-```bash
-# 1. Run Shared Unit Tests
-cd shared
-flutter test
-
-# 2. Run Guru App (Member) Tests
-cd ../guru_app
-flutter test
-
-# 3. Run Trainer App Tests
-cd ../trainer_app
-flutter test
+```text
+wtf_flutter_test/
++-- token_server/          # Node.js 100ms Token Server (Express :8080)
+¶   +-- server.js          # GET /token?userId=&role=&roomId=
+¶   +-- .env               # HMS_APP_ACCESS_KEY & HMS_APP_SECRET
+¶   +-- package.json
++-- guru_app/              # Self-contained Member Flutter Mobile App
+¶   +-- lib/
+¶   ¶   +-- main.dart
+¶   ¶   +-- presentation/  # Onboarding, Home, Chat, Scheduler, Sessions
+¶   ¶   +-- providers/     # GuruViewModel
+¶   ¶   +-- shared/        # Models, Services, Widgets, 100ms RTC Service, Utils
+¶   +-- test/              # 11 Unit tests (Domain, View Model, Scheduler constraints)
++-- trainer_app/           # Self-contained Trainer Flutter Mobile App
+¶   +-- lib/
+¶   ¶   +-- main.dart
+¶   ¶   +-- presentation/  # Login, Home, Members, Chat, Requests, Sessions
+¶   ¶   +-- providers/     # TrainerViewModel
+¶   ¶   +-- shared/        # Models, Services, Widgets, 100ms RTC Service, Utils
+¶   +-- test/              # 11 Unit tests (Domain, View Model, Call Approvals)
++-- AI_LEDGER.md           # Mandatory AI-native prompt ledger (15 entries)
++-- ARCHITECTURE.md        # Architecture diagrams & 100ms RTC lifecycle
++-- DECISIONS.md           # ADR #1 (State Mgmt), #2 (Storage/Sync), #3 (RTC Strategy)
++-- README.md
 ```
 
-### 2. Start 100ms Token Server
+---
+
+## 2. Quickstart Instructions
+
+### Step 1: Start the 100ms Token Server
 ```bash
 cd token_server
 npm install
 npm start
 ```
-*The token server will listen on `http://localhost:8080` and serve `GET /token?userId=&role=&roomId=`.*
 
-### 3. Launch the Flutter Applications
-
-#### Launch Guru App (Member ‚Äî DK Persona):
+### Step 2: Run Guru App (Member)
 ```bash
 cd guru_app
-flutter run -d chrome # or -d android / -d windows
+flutter pub get
+flutter run -d android # or -d ios / -d chrome
 ```
 
-#### Launch Trainer App (Trainer ‚Äî Aarav Persona):
+### Step 3: Run Trainer App (Trainer)
 ```bash
 cd trainer_app
-flutter run -d chrome # or -d android / -d windows
+flutter pub get
+flutter run -d android # or -d ios / -d chrome
 ```
 
 ---
 
-## 9-Step Reviewer Manual Test Script
+## 3. Automated Test Suites
 
-Follow these 9 steps to test the full end-to-end integration:
+Both applications are self-contained and run complete unit test suites:
 
-| Step | Action | Expected Result |
-|---|---|---|
-| **1** | Launch **Trainer App** | Seeded login prefilled as **Aarav (Lead Trainer)**. Tap *Access Trainer Dashboard* to land on 4-tile Home screen. |
-| **2** | Launch **Guru App** | Complete 2-step onboarding. Screen prefilled with **DK** persona and auto-assigned to **Aarav**. Lands on 3-card Home screen. |
-| **3** | DK sends `"Hi Coach üëç"` | Trainer App displays unread badge on Chat tile. Trainer opens chat, sees Blue bubble on left, replies with `"See you on call at 6!"`. Single/double ticks update and typing indicator animates. |
-| **4** | DK schedules a call | In Guru App, tap *Schedule Call*, pick today 6:00 PM, enter note: `"Macros review"`, tap *Request Call*. Toast confirms: `"Call requested. Waiting for trainer approval."` |
-| **5** | Trainer approves request | In Trainer App, open *Requests* tab. See DK's note `"Macros review"`. Tap **Approve**. Guru App receives chat system message: `"Call approved for 6:00 PM"` and an **Upcoming Video Session** banner appears on Home. |
-| **6** | Join Video Call | Tap **Join Call Now** on either app. Pre-join Device Check modal opens with camera/mic preview and role mapping (`trainer` / `member`). Tap *Join Video Call Now*. |
-| **7** | Active 100ms In-Call UI | 2-participant video grid loads with name labels and live duration timer. Test Mute/Unmute, Video On/Off, Flip Camera, and tap glitch icon to verify auto-reconnect resilience. |
-| **8** | End Call & Feedback | Tap **End Call / Leave Call**. Call ends and auto-writes `SessionLog`. Member rates **5‚òÖ** with note; Trainer enters session notes and taps **Mark as Complete**. |
-| **9** | Open Sessions List | Open *My Sessions* in Guru App and *Sessions* in Trainer App. Latest completed session appears at the top showing calculated duration (e.g. `12m 45s`), 5‚òÖ rating, and detailed coach/member notes. |
+```bash
+# Run Guru App Tests (11 passed)
+cd guru_app
+flutter test
 
----
-
-## Architecture & Code Highlights
-
-- **Shared Core Module (`shared/`)**: Single source of truth containing immutable models (`User`, `Message`, `CallRequest`, `SessionLog`, `RoomMeta`), 8pt design tokens, validators, and formatters.
-- **Local-First Sync Engine (`SyncBridge`)**: Real-time cross-process sync loop ensuring instantaneous updates (< 250ms) between apps without requiring remote cloud servers.
-- **Observability DevPanel (`‚ãÆ`)**: Tap the floating button in either app to inspect masked environment variables, runtime metadata, and the last 20 structured logs tagged `[CHAT]`, `[RTC]`, `[SCHEDULE]`, `[AUTH]`.
-- **100ms RTC Video Integration**: Strict role separation (`trainer` as host vs `member` as participant), pre-join device check, grid video layout, and connection recovery.
-
----
-
-## Assessment Deliverables Checklist
-
-- [x] **Monorepo Structure**: `token_server/`, `shared/`, `guru_app/`, `trainer_app/`
-- [x] **ADR Document**: `DECISIONS.md` (ADR #1 State Mgmt, ADR #2 Storage & Sync, ADR #3 RTC Strategy)
-- [x] **System Architecture**: `ARCHITECTURE.md` (Diagrams, data flow, 100ms lifecycle)
-- [x] **AI Ledger**: `AI_LEDGER.md` (‚â•10 structured entries + debugging & refactoring records)
-- [x] **Quality Gates**: All automated unit tests passing in `shared/`, `guru_app/`, `trainer_app/` with 0 warnings.
-- [x] **UI & Design**: 8pt spacing, Netflix Red (`#E50914`), Electric Blue (`#1769E0`), exact UI strings matching specification Section 11.
+# Run Trainer App Tests (11 passed)
+cd trainer_app
+flutter test
+```

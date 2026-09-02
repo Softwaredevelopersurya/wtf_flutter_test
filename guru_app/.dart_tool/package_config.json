@@ -86,6 +86,12 @@
       "languageVersion": "3.8"
     },
     {
+      "name": "hmssdk_flutter",
+      "rootUri": "file:///E:/PubCache/hosted/pub.dev/hmssdk_flutter-1.11.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.16"
+    },
+    {
       "name": "http",
       "rootUri": "file:///E:/PubCache/hosted/pub.dev/http-1.6.0",
       "packageUri": "lib/",
@@ -210,12 +216,6 @@
       "rootUri": "file:///E:/PubCache/hosted/pub.dev/provider-6.1.5+1",
       "packageUri": "lib/",
       "languageVersion": "2.12"
-    },
-    {
-      "name": "shared",
-      "rootUri": "../../shared",
-      "packageUri": "lib/",
-      "languageVersion": "3.0"
     },
     {
       "name": "shared_preferences",

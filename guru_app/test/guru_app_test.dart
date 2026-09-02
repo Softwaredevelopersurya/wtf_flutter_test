@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:guru_app/providers/guru_view_model.dart';
-import 'package:shared/shared.dart';
+import 'package:guru_app/shared/shared.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -36,3 +36,4 @@ void main() {
     });
   });
 }
+

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/guru_app/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/guru_app/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/guru_app/build" />
+      <excludeFolder url="file://$MODULE_DIR$/shared/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/shared/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/shared/build" />
+      <excludeFolder url="file://$MODULE_DIR$/trainer_app/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/trainer_app/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/trainer_app/build" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

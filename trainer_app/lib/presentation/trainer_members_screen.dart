@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared/shared.dart';
+import 'package:trainer_app/shared/shared.dart';
 import '../providers/trainer_view_model.dart';
 import 'trainer_chat_screen.dart';
 import 'trainer_sessions_screen.dart';
@@ -111,3 +111,4 @@ class TrainerMembersScreen extends StatelessWidget {
     );
   }
 }
+
