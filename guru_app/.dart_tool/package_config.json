@@ -218,6 +218,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "shared",
+      "rootUri": "../../shared",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "shared_preferences",
       "rootUri": "file:///E:/PubCache/hosted/pub.dev/shared_preferences-2.5.3",
       "packageUri": "lib/",

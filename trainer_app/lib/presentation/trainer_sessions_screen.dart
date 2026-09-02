@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:trainer_app/shared/shared.dart';
+import 'package:shared/shared.dart';
 import '../providers/trainer_view_model.dart';
 
 enum TrainerSessionFilter {
@@ -253,5 +253,6 @@ class _TrainerSessionsScreenState extends State<TrainerSessionsScreen> {
     );
   }
 }
+
 
 

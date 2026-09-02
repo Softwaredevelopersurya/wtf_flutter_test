@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:trainer_app/shared/shared.dart';
+import 'package:shared/shared.dart';
 
 class TrainerViewModel extends ChangeNotifier {
   final AuthService _auth = AuthService();
@@ -157,4 +157,5 @@ class TrainerViewModel extends ChangeNotifier {
     super.dispose();
   }
 }
+
 

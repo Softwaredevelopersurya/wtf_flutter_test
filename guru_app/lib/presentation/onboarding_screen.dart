@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:guru_app/shared/shared.dart';
+import 'package:shared/shared.dart';
 import '../providers/guru_view_model.dart';
 import 'guru_home_screen.dart';
 
@@ -246,5 +246,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
+
 
 

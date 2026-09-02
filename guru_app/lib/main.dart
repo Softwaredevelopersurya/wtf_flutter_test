@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:guru_app/shared/shared.dart';
+import 'package:shared/shared.dart';
 import 'providers/guru_view_model.dart';
 import 'presentation/onboarding_screen.dart';
 import 'presentation/guru_home_screen.dart';
@@ -34,4 +34,5 @@ class GuruApp extends StatelessWidget {
     );
   }
 }
+
 

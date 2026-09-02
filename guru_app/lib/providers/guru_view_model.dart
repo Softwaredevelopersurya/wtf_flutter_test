@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:guru_app/shared/shared.dart';
+import 'package:shared/shared.dart';
 
 class GuruViewModel extends ChangeNotifier {
   final AuthService _auth = AuthService();
@@ -184,4 +184,5 @@ class GuruViewModel extends ChangeNotifier {
     super.dispose();
   }
 }
+
 

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:trainer_app/providers/trainer_view_model.dart';
-import 'package:trainer_app/shared/shared.dart';
+import 'package:shared/shared.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -51,4 +51,5 @@ void main() {
     });
   });
 }
+
 

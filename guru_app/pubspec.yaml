@@ -11,12 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.1.2
-  intl: ^0.19.0
-  uuid: ^4.3.3
-  http: ^1.2.0
-  path_provider: ^2.1.2
-  shared_preferences: ^2.2.2
-  hmssdk_flutter: ^1.11.1
+  shared:
+    path: ../shared
 
 dev_dependencies:
   flutter_test:
