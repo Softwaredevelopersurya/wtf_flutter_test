@@ -1,0 +1,20 @@
+{
+  "name": "wtf-100ms-token-server",
+  "version": "1.0.0",
+  "description": "Minimal 100ms Auth Token Server for Guru & Trainer Apps",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": ["100ms", "webrtc", "flutter", "token-server"],
+  "author": "Antigravity Engineer",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^9.0.1"
+  }
+}
