@@ -43,6 +43,7 @@ class GuruHomeScreen extends StatelessWidget {
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
                       builder: (_) => MemberPostCallSheet(
+                        session: log,
                         onSubmit: (rating, note) async {
                           await vm.rateSession(log.id, rating, note);
                           if (context.mounted) {
@@ -211,7 +212,7 @@ class GuruHomeScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         boxShadow: [
           BoxShadow(
-            color: AppColors.guruPrimary.withOpacity(0.3),
+            color: AppColors.guruPrimary.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -284,7 +285,7 @@ class GuruHomeScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 ),
                 child: Icon(icon, color: color, size: 28),
@@ -336,4 +337,6 @@ class GuruHomeScreen extends StatelessWidget {
     );
   }
 }
+
+
 

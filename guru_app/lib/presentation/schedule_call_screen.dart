@@ -64,7 +64,7 @@ class _ScheduleCallScreenState extends State<ScheduleCallScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text(AppStrings.requestSent),
             backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
@@ -133,7 +133,7 @@ class _ScheduleCallScreenState extends State<ScheduleCallScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(trainer?.name ?? 'Coach Aarav', style: AppTypography.h3),
-                          Text('1-on-1 Consultation • 30 mins', style: AppTypography.caption),
+                          const Text('1-on-1 Consultation • 30 mins', style: AppTypography.caption),
                         ],
                       ),
                     ),
@@ -169,7 +169,7 @@ class _ScheduleCallScreenState extends State<ScheduleCallScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Session Topic / Note', style: AppTypography.bodyMediumSemiBold),
+                          const Text('Session Topic / Note', style: AppTypography.bodyMediumSemiBold),
                           ValueListenableBuilder(
                             valueListenable: _noteController,
                             builder: (context, TextEditingValue value, _) {
@@ -216,7 +216,7 @@ class _ScheduleCallScreenState extends State<ScheduleCallScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('My Requests & Status', style: AppTypography.h3),
+                  const Text('My Requests & Status', style: AppTypography.h3),
                   Text('${requests.length} total', style: AppTypography.caption),
                 ],
               ),
@@ -287,7 +287,7 @@ class _ScheduleCallScreenState extends State<ScheduleCallScreen> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.calendar_today_rounded, size: 14, color: AppColors.guruPrimary),
+                    const Icon(Icons.calendar_today_rounded, size: 14, color: AppColors.guruPrimary),
                     AppSpacing.gapH8,
                     Text(
                       Formatters.formatFriendlyDateTime(req.scheduledFor),
@@ -298,9 +298,9 @@ class _ScheduleCallScreenState extends State<ScheduleCallScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.12),
+                    color: statusColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-                    border: Border.all(color: statusColor.withOpacity(0.3)),
+                    border: Border.all(color: statusColor.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -338,4 +338,5 @@ class _ScheduleCallScreenState extends State<ScheduleCallScreen> {
     );
   }
 }
+
 

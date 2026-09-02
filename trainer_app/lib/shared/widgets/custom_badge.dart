@@ -22,9 +22,9 @@ class CustomBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
       decoration: BoxDecoration(
-        color: backgroundColor.withOpacity(0.12),
+        color: backgroundColor.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-        border: Border.all(color: backgroundColor.withOpacity(0.3)),
+        border: Border.all(color: backgroundColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -72,3 +72,4 @@ class RoleAppBarTitle extends StatelessWidget {
     );
   }
 }
+

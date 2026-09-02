@@ -21,11 +21,11 @@ class FloatingDevPanelButton extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
-              color: AppColors.darkSurface.withOpacity(0.85),
+              color: AppColors.darkSurface.withValues(alpha: 0.85),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -320,7 +320,7 @@ class _DevPanelModalState extends State<DevPanelModal> {
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: AppColors.darkSurfaceVariant.withOpacity(0.5),
+        color: AppColors.darkSurfaceVariant.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
         border: Border(left: BorderSide(color: log.isError ? AppColors.error : tagColor, width: 3)),
       ),
@@ -354,3 +354,4 @@ class _DevPanelModalState extends State<DevPanelModal> {
     );
   }
 }
+

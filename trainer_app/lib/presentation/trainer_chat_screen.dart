@@ -74,7 +74,7 @@ class _TrainerChatScreenState extends State<TrainerChatScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Share Coaching Resource', style: AppTypography.h3),
+                const Text('Share Coaching Resource', style: AppTypography.h3),
                 AppSpacing.gapV16,
                 ListTile(
                   leading: const CircleAvatar(backgroundColor: AppColors.trainerPrimary, child: Icon(Icons.menu_book, color: Colors.white)),
@@ -140,7 +140,7 @@ class _TrainerChatScreenState extends State<TrainerChatScreen> {
                         decoration: const BoxDecoration(color: AppColors.success, shape: BoxShape.circle),
                       ),
                       AppSpacing.gapH4,
-                      Text('Athlete • Member', style: AppTypography.caption),
+                      const Text('Athlete • Member', style: AppTypography.caption),
                     ],
                   ),
                 ],
@@ -210,13 +210,13 @@ class _TrainerChatScreenState extends State<TrainerChatScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.trainerPrimary.withOpacity(0.1),
+                color: AppColors.trainerPrimary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.chat_bubble_outline_rounded, size: 64, color: AppColors.trainerPrimary),
             ),
             AppSpacing.gapV16,
-            Text(AppStrings.emptyChat, style: AppTypography.bodyLarge, textAlign: TextAlign.center),
+            const Text(AppStrings.emptyChat, style: AppTypography.bodyLarge, textAlign: TextAlign.center),
             AppSpacing.gapV16,
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
@@ -278,4 +278,5 @@ class _TrainerChatScreenState extends State<TrainerChatScreen> {
     );
   }
 }
+
 

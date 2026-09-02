@@ -68,7 +68,7 @@ class _GuruChatScreenState extends State<GuruChatScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Attach Media', style: AppTypography.h3),
+                const Text('Attach Media', style: AppTypography.h3),
                 AppSpacing.gapV16,
                 ListTile(
                   leading: const CircleAvatar(backgroundColor: Colors.orange, child: Icon(Icons.fitness_center, color: Colors.white)),
@@ -135,7 +135,7 @@ class _GuruChatScreenState extends State<GuruChatScreen> {
                         decoration: const BoxDecoration(color: AppColors.success, shape: BoxShape.circle),
                       ),
                       AppSpacing.gapH4,
-                      Text('Online • Lead Trainer', style: AppTypography.caption),
+                      const Text('Online • Lead Trainer', style: AppTypography.caption),
                     ],
                   ),
                 ],
@@ -232,13 +232,13 @@ class _GuruChatScreenState extends State<GuruChatScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.guruPrimary.withOpacity(0.1),
+                color: AppColors.guruPrimary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.chat_bubble_outline_rounded, size: 64, color: AppColors.guruPrimary),
             ),
             AppSpacing.gapV16,
-            Text(AppStrings.emptyChat, style: AppTypography.bodyLarge, textAlign: TextAlign.center),
+            const Text(AppStrings.emptyChat, style: AppTypography.bodyLarge, textAlign: TextAlign.center),
             AppSpacing.gapV16,
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(minimumSize: const Size(160, 44)),
@@ -297,4 +297,5 @@ class _GuruChatScreenState extends State<GuruChatScreen> {
     );
   }
 }
+
 

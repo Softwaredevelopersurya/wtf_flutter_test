@@ -65,7 +65,7 @@ class _TimeSlotPickerState extends State<TimeSlotPicker> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 3-Day Selector
-        Text('Select Date (Next 3 Days)', style: AppTypography.bodyMediumSemiBold),
+        const Text('Select Date (Next 3 Days)', style: AppTypography.bodyMediumSemiBold),
         AppSpacing.gapV8,
         Row(
           children: _next3Days.map((day) {
@@ -121,7 +121,7 @@ class _TimeSlotPickerState extends State<TimeSlotPicker> {
         AppSpacing.gapV16,
 
         // 30-min Time Slots
-        Text('Available 30-min Blocks', style: AppTypography.bodyMediumSemiBold),
+        const Text('Available 30-min Blocks', style: AppTypography.bodyMediumSemiBold),
         AppSpacing.gapV8,
 
         Wrap(

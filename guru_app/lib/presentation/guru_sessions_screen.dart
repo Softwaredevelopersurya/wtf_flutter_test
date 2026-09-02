@@ -52,7 +52,7 @@ class _GuruSessionsScreenState extends State<GuruSessionsScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Session Details', style: AppTypography.h2),
+                    const Text('Session Details', style: AppTypography.h2),
                     if (log.rating != null)
                       Row(
                         children: [
@@ -71,7 +71,7 @@ class _GuruSessionsScreenState extends State<GuruSessionsScreen> {
                 AppSpacing.gapV16,
 
                 // Member Notes
-                Text('Your Notes & Feedback', style: AppTypography.bodyMediumSemiBold),
+                const Text('Your Notes & Feedback', style: AppTypography.bodyMediumSemiBold),
                 AppSpacing.gapV4,
                 Container(
                   width: double.infinity,
@@ -90,7 +90,7 @@ class _GuruSessionsScreenState extends State<GuruSessionsScreen> {
                 AppSpacing.gapV16,
 
                 // Trainer Notes
-                Text('Trainer Feedback & Workout Plan', style: AppTypography.bodyMediumSemiBold),
+                const Text('Trainer Feedback & Workout Plan', style: AppTypography.bodyMediumSemiBold),
                 AppSpacing.gapV4,
                 Container(
                   width: double.infinity,
@@ -183,7 +183,7 @@ class _GuruSessionsScreenState extends State<GuruSessionsScreen> {
                       child: FilterChip(
                         selected: isSelected,
                         label: Text(filter.label),
-                        selectedColor: AppColors.guruPrimary.withOpacity(0.15),
+                        selectedColor: AppColors.guruPrimary.withValues(alpha: 0.15),
                         checkmarkColor: AppColors.guruPrimary,
                         labelStyle: TextStyle(
                           color: isSelected ? AppColors.guruPrimary : AppColors.textSecondary,
@@ -212,7 +212,7 @@ class _GuruSessionsScreenState extends State<GuruSessionsScreen> {
                               leading: Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: AppColors.guruPrimary.withOpacity(0.12),
+                                  color: AppColors.guruPrimary.withValues(alpha: 0.12),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(Icons.fitness_center_rounded, color: AppColors.guruPrimary),
@@ -262,7 +262,7 @@ class _GuruSessionsScreenState extends State<GuruSessionsScreen> {
               child: const Icon(Icons.calendar_today_outlined, size: 64, color: AppColors.guruPrimary),
             ),
             AppSpacing.gapV16,
-            Text('No completed sessions found.', style: AppTypography.bodyLarge),
+            const Text('No completed sessions found.', style: AppTypography.bodyLarge),
             AppSpacing.gapV16,
             ElevatedButton(
               style: ElevatedButton.styleFrom(minimumSize: const Size(200, 44)),
@@ -279,4 +279,5 @@ class _GuruSessionsScreenState extends State<GuruSessionsScreen> {
     );
   }
 }
+
 

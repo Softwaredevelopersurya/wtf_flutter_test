@@ -62,13 +62,13 @@ class _TrainerLoginScreenState extends State<TrainerLoginScreen> {
                     height: 72,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.trainerPrimary.withOpacity(0.12),
+                      color: AppColors.trainerPrimary.withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.sports_gymnastics_rounded, size: 40, color: AppColors.trainerPrimary),
                   ),
                   AppSpacing.gapV24,
-                  Text('Trainer Portal', style: AppTypography.h1, textAlign: TextAlign.center),
+                  const Text('Trainer Portal', style: AppTypography.h1, textAlign: TextAlign.center),
                   AppSpacing.gapV8,
                   Text(
                     'Lead Coach Management Console',
@@ -85,9 +85,9 @@ class _TrainerLoginScreenState extends State<TrainerLoginScreen> {
                       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                       border: Border.all(color: AppColors.borderLight),
                     ),
-                    child: Row(
+                    child: const Row(
                       children: [
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 26,
                           backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'),
                         ),
@@ -99,7 +99,7 @@ class _TrainerLoginScreenState extends State<TrainerLoginScreen> {
                               Text(AppStrings.trainerSeedName, style: AppTypography.bodyMediumSemiBold),
                               Text('aarav.trainer@wtf.fitness', style: AppTypography.caption),
                               AppSpacing.gapV4,
-                              const CustomBadge(text: 'Lead Coach', backgroundColor: AppColors.trainerPrimary),
+                              CustomBadge(text: 'Lead Coach', backgroundColor: AppColors.trainerPrimary),
                             ],
                           ),
                         ),
@@ -127,4 +127,5 @@ class _TrainerLoginScreenState extends State<TrainerLoginScreen> {
     );
   }
 }
+
 

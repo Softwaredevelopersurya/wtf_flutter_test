@@ -6,13 +6,13 @@ import '../utils/app_typography.dart';
 
 /// Member Post-Call Rating & Feedback Sheet
 class MemberPostCallSheet extends StatefulWidget {
-  final SessionLog session;
+  final SessionLog? session;
   final String trainerName;
   final Future<void> Function(int rating, String note) onSubmit;
 
   const MemberPostCallSheet({
     super.key,
-    required this.session,
+    this.session,
     this.trainerName = 'Aarav (Lead Trainer)',
     required this.onSubmit,
   });
@@ -130,13 +130,13 @@ class _MemberPostCallSheetState extends State<MemberPostCallSheet> {
 
 /// Trainer Post-Call Session Notes Sheet
 class TrainerPostCallSheet extends StatefulWidget {
-  final SessionLog session;
+  final SessionLog? session;
   final String clientName;
   final Future<void> Function(String trainerNotes) onComplete;
 
   const TrainerPostCallSheet({
     super.key,
-    required this.session,
+    this.session,
     this.clientName = 'DK',
     required this.onComplete,
   });
@@ -157,6 +157,8 @@ class _TrainerPostCallSheetState extends State<TrainerPostCallSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final durationSuffix = widget.session != null ? ' (${widget.session!.formattedDuration})' : '';
+
     return Container(
       padding: EdgeInsets.only(
         top: AppSpacing.lg,
@@ -191,7 +193,7 @@ class _TrainerPostCallSheetState extends State<TrainerPostCallSheet> {
             ),
             AppSpacing.gapV4,
             Text(
-              'Client: ${widget.clientName} (${widget.session.formattedDuration})',
+              'Client: ${widget.clientName}$durationSuffix',
               style: AppTypography.bodySmall.copyWith(color: AppColors.darkTextMuted),
               textAlign: TextAlign.center,
             ),

@@ -51,7 +51,7 @@ class _TrainerSessionsScreenState extends State<TrainerSessionsScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Completed Session Log', style: AppTypography.h2),
+                    const Text('Completed Session Log', style: AppTypography.h2),
                     if (log.rating != null)
                       Row(
                         children: [
@@ -70,7 +70,7 @@ class _TrainerSessionsScreenState extends State<TrainerSessionsScreen> {
                 AppSpacing.gapV16,
 
                 // Trainer Notes
-                Text('Trainer Feedback & Directives', style: AppTypography.bodyMediumSemiBold),
+                const Text('Trainer Feedback & Directives', style: AppTypography.bodyMediumSemiBold),
                 AppSpacing.gapV4,
                 Container(
                   width: double.infinity,
@@ -89,7 +89,7 @@ class _TrainerSessionsScreenState extends State<TrainerSessionsScreen> {
                 AppSpacing.gapV16,
 
                 // Member Notes
-                Text('Member Feedback', style: AppTypography.bodyMediumSemiBold),
+                const Text('Member Feedback', style: AppTypography.bodyMediumSemiBold),
                 AppSpacing.gapV4,
                 Container(
                   width: double.infinity,
@@ -185,7 +185,7 @@ class _TrainerSessionsScreenState extends State<TrainerSessionsScreen> {
                       child: FilterChip(
                         selected: isSelected,
                         label: Text(filter.label),
-                        selectedColor: AppColors.trainerPrimary.withOpacity(0.15),
+                        selectedColor: AppColors.trainerPrimary.withValues(alpha: 0.15),
                         checkmarkColor: AppColors.trainerPrimary,
                         labelStyle: TextStyle(
                           color: isSelected ? AppColors.trainerPrimary : AppColors.textSecondary,
@@ -219,7 +219,7 @@ class _TrainerSessionsScreenState extends State<TrainerSessionsScreen> {
                               leading: Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: AppColors.trainerPrimary.withOpacity(0.12),
+                                  color: AppColors.trainerPrimary.withValues(alpha: 0.12),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(Icons.sports_gymnastics_rounded, color: AppColors.trainerPrimary),
@@ -253,4 +253,5 @@ class _TrainerSessionsScreenState extends State<TrainerSessionsScreen> {
     );
   }
 }
+
 

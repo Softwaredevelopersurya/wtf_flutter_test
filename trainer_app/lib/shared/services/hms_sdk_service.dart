@@ -167,7 +167,7 @@ class HMSSdkService implements HMSUpdateListener {
     }
   }
 
-  // --- Complete HMSUpdateListener Callbacks Implementation ---
+  // --- Complete HMSUpdateListener Callbacks ---
 
   @override
   void onJoin({required HMSRoom room}) {
@@ -219,11 +219,6 @@ class HMSSdkService implements HMSUpdateListener {
     _isReconnecting = false;
     _logger.logRtc('100ms onReconnected: Connection successfully restored');
     _reconnectingController.add(false);
-  }
-
-  @override
-  void onError({required HMSException error}) {
-    _logger.logRtc('100ms onError: [${error.code}] ${error.message}', isError: true);
   }
 
   @override

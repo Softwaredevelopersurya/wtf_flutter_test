@@ -32,7 +32,7 @@ class _TrainerRequestsScreenState extends State<TrainerRequestsScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Decline Call Request', style: AppTypography.h2),
+              const Text('Decline Call Request', style: AppTypography.h2),
               AppSpacing.gapV8,
               Text(
                 'Provide a brief reason to notify the member.',
@@ -103,7 +103,7 @@ class _TrainerRequestsScreenState extends State<TrainerRequestsScreen> {
                       child: ChoiceChip(
                         label: Center(child: Text('Pending (${pendingRequests.length})')),
                         selected: _selectedTabIndex == 0,
-                        selectedColor: AppColors.trainerPrimary.withOpacity(0.15),
+                        selectedColor: AppColors.trainerPrimary.withValues(alpha: 0.15),
                         labelStyle: TextStyle(
                           color: _selectedTabIndex == 0 ? AppColors.trainerPrimary : AppColors.textSecondary,
                           fontWeight: _selectedTabIndex == 0 ? FontWeight.bold : FontWeight.normal,
@@ -118,7 +118,7 @@ class _TrainerRequestsScreenState extends State<TrainerRequestsScreen> {
                       child: ChoiceChip(
                         label: Center(child: Text('All Requests (${allRequests.length})')),
                         selected: _selectedTabIndex == 1,
-                        selectedColor: AppColors.trainerPrimary.withOpacity(0.15),
+                        selectedColor: AppColors.trainerPrimary.withValues(alpha: 0.15),
                         labelStyle: TextStyle(
                           color: _selectedTabIndex == 1 ? AppColors.trainerPrimary : AppColors.textSecondary,
                           fontWeight: _selectedTabIndex == 1 ? FontWeight.bold : FontWeight.normal,
@@ -156,9 +156,9 @@ class _TrainerRequestsScreenState extends State<TrainerRequestsScreen> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Row(
+                                      const Row(
                                         children: [
-                                          const CircleAvatar(
+                                          CircleAvatar(
                                             radius: 16,
                                             backgroundImage: NetworkImage('https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150'),
                                           ),
@@ -275,9 +275,9 @@ class _TrainerRequestsScreenState extends State<TrainerRequestsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
         label,
@@ -286,4 +286,5 @@ class _TrainerRequestsScreenState extends State<TrainerRequestsScreen> {
     );
   }
 }
+
 

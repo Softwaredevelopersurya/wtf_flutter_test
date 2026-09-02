@@ -45,6 +45,7 @@ class TrainerHomeScreen extends StatelessWidget {
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
                       builder: (_) => TrainerPostCallSheet(
+                        session: log,
                         onComplete: (notes) async {
                           await vm.submitTrainerNotes(log.id, notes);
                           if (context.mounted) {
@@ -129,7 +130,7 @@ class TrainerHomeScreen extends StatelessWidget {
                 AppSpacing.gapV16,
               ],
 
-              Text('Trainer Operations Console', style: AppTypography.h1),
+              const Text('Trainer Operations Console', style: AppTypography.h1),
               AppSpacing.gapV4,
               Text(
                 'Manage assigned members, calls, and coaching requests.',
@@ -212,7 +213,7 @@ class TrainerHomeScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Pending Call Approvals', style: AppTypography.h3),
+                    const Text('Pending Call Approvals', style: AppTypography.h3),
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).push(
@@ -246,7 +247,7 @@ class TrainerHomeScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         boxShadow: [
           BoxShadow(
-            color: AppColors.trainerPrimary.withOpacity(0.35),
+            color: AppColors.trainerPrimary.withValues(alpha: 0.35),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -323,7 +324,7 @@ class TrainerHomeScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.12),
+                      color: color.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                     ),
                     child: Icon(icon, color: color, size: 24),
@@ -374,7 +375,7 @@ class TrainerHomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('DK (Member)', style: AppTypography.bodyMediumSemiBold),
+                  const Text('DK (Member)', style: AppTypography.bodyMediumSemiBold),
                   Text(
                     '${Formatters.formatFriendlyDateTime(req.scheduledFor)}: "${req.note}"',
                     style: AppTypography.bodySmall,
@@ -393,4 +394,6 @@ class TrainerHomeScreen extends StatelessWidget {
     );
   }
 }
+
+
 

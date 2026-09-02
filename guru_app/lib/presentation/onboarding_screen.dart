@@ -18,7 +18,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // Profile setup form state (pre-seeded as specified in assessment)
   final TextEditingController _nameController = TextEditingController(text: AppStrings.memberSeedName);
   final TextEditingController _emailController = TextEditingController(text: 'dk.member@wtf.fitness');
-  String _selectedTrainerId = AppStrings.trainerSeedId;
+  final String _selectedTrainerId = AppStrings.trainerSeedId;
 
   @override
   void dispose() {
@@ -151,7 +151,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Container(
             padding: const EdgeInsets.all(28),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, size: 72, color: color),
@@ -176,7 +176,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AppSpacing.gapV16,
-          Text('Create Member Profile', style: AppTypography.h1),
+          const Text('Create Member Profile', style: AppTypography.h1),
           AppSpacing.gapV8,
           Text(
             'Confirm your profile details. (Pre-seeded as DK persona for assessment review)',
@@ -185,7 +185,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           AppSpacing.gapV24,
 
           // Name Field (prefilled DK)
-          Text('Full Name', style: AppTypography.bodyMediumSemiBold),
+          const Text('Full Name', style: AppTypography.bodyMediumSemiBold),
           AppSpacing.gapV8,
           TextField(
             controller: _nameController,
@@ -198,7 +198,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           AppSpacing.gapV16,
 
           // Email Field
-          Text('Email Address', style: AppTypography.bodyMediumSemiBold),
+          const Text('Email Address', style: AppTypography.bodyMediumSemiBold),
           AppSpacing.gapV8,
           TextField(
             controller: _emailController,
@@ -212,7 +212,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           AppSpacing.gapV16,
 
           // Assigned Trainer
-          Text('Assigned Coach', style: AppTypography.bodyMediumSemiBold),
+          const Text('Assigned Coach', style: AppTypography.bodyMediumSemiBold),
           AppSpacing.gapV8,
           Container(
             padding: AppSpacing.paddingMd,
@@ -221,9 +221,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
               border: Border.all(color: Colors.blue.shade200),
             ),
-            child: Row(
+            child: const Row(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 20,
                   backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'),
                 ),
@@ -237,7 +237,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ],
                   ),
                 ),
-                const Icon(Icons.check_circle, color: AppColors.guruPrimary),
+                Icon(Icons.check_circle, color: AppColors.guruPrimary),
               ],
             ),
           ),
@@ -246,4 +246,5 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
+
 
