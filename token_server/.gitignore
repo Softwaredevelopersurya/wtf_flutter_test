@@ -58,3 +58,4 @@ Thumbs.db
 
 # Optional TypeScript build info
 *.tsbuildinfo
+.vercel

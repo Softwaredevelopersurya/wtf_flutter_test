@@ -58,8 +58,17 @@ class AuthService {
     required String assignedTrainerId,
     String? avatarUrl,
   }) async {
+    final isDkPersona = name.trim().toUpperCase() == 'DK' ||
+        email.trim().toLowerCase().contains('dk.member') ||
+        email.trim().toLowerCase() == 'dk@wtf.fitness';
+
+    final sanitizedName = name.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+    final memberId = isDkPersona
+        ? 'user_member_dk'
+        : 'user_member_${sanitizedName.isNotEmpty ? sanitizedName : DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+
     final user = User(
-      id: 'user_member_${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
+      id: memberId,
       role: UserRole.member,
       name: name,
       email: email,
@@ -73,7 +82,7 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyMemberOnboarded, true);
 
-    _logger.logAuth('Completed member onboarding for ${user.name}, assigned to trainer: $assignedTrainerId');
+    _logger.logAuth('Completed member onboarding for ${user.name} (ID: ${user.id}), assigned to trainer: $assignedTrainerId');
     return user;
   }
 

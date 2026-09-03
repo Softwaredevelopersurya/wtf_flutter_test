@@ -4,7 +4,8 @@ import 'package:shared/shared.dart';
 import '../providers/trainer_view_model.dart';
 
 class TrainerChatScreen extends StatefulWidget {
-  const TrainerChatScreen({super.key});
+  final User? targetMember;
+  const TrainerChatScreen({super.key, this.targetMember});
 
   @override
   State<TrainerChatScreen> createState() => _TrainerChatScreenState();
@@ -14,6 +15,8 @@ class _TrainerChatScreenState extends State<TrainerChatScreen> {
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _isSending = false;
+
+  int _previousMessageCount = 0;
 
   static const List<String> _trainerQuickReplies = [
     "Great form! 👍",
@@ -26,7 +29,8 @@ class _TrainerChatScreenState extends State<TrainerChatScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TrainerViewModel>().markMessagesAsRead();
+      context.read<TrainerViewModel>().markMessagesAsRead(targetMember: widget.targetMember);
+      _scrollToBottom();
     });
   }
 
@@ -57,7 +61,7 @@ class _TrainerChatScreenState extends State<TrainerChatScreen> {
     setState(() => _isSending = true);
     _textController.clear();
 
-    await vm.sendMessage(text);
+    await vm.sendMessage(text, targetMember: widget.targetMember);
     setState(() => _isSending = false);
     _scrollToBottom();
   }
@@ -104,7 +108,7 @@ class _TrainerChatScreenState extends State<TrainerChatScreen> {
 
   Future<void> _handleSendWithAttachment(String url, String text) async {
     final vm = context.read<TrainerViewModel>();
-    await vm.sendMessage(text, attachmentUrl: url);
+    await vm.sendMessage(text, attachmentUrl: url, targetMember: widget.targetMember);
     _scrollToBottom();
   }
 
@@ -112,8 +116,12 @@ class _TrainerChatScreenState extends State<TrainerChatScreen> {
   Widget build(BuildContext context) {
     final vm = context.watch<TrainerViewModel>();
     final user = vm.currentUser;
-    final member = vm.primaryMember;
-    final messages = vm.messagesForPrimaryMember;
+    final member = widget.targetMember ?? vm.activeMember ?? vm.primaryMember;
+    final messages = member != null ? vm.getMessagesForMember(member) : vm.messagesForPrimaryMember;
+    if (messages.length != _previousMessageCount) {
+      _previousMessageCount = messages.length;
+      _scrollToBottom();
+    }
     final isTyping = member != null && vm.isMemberTyping(member.id);
 
     return Scaffold(
@@ -131,7 +139,7 @@ class _TrainerChatScreenState extends State<TrainerChatScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(member?.name ?? 'DK', style: AppTypography.bodyMediumSemiBold),
+                  Text(member?.name ?? 'Member', style: AppTypography.bodyMediumSemiBold),
                   Row(
                     children: [
                       Container(

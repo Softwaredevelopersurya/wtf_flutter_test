@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import '../models/models.dart';
+import '../utils/app_config.dart';
 import 'log_service.dart';
 
-/// Lightweight local cross-app synchronization bridge
-/// Ensures Guru App & Trainer App communicate in real time locally without requiring a remote cloud backend.
+/// Lightweight cross-app synchronization bridge
+/// Ensures Guru App & Trainer App communicate in real time locally and across devices/emulators via shared file & HTTP sync.
 class SyncBridge {
   static final SyncBridge _instance = SyncBridge._internal();
   factory SyncBridge() => _instance;
@@ -44,31 +46,57 @@ class SyncBridge {
   Map<String, bool> get typingStatus => Map.unmodifiable(_typingStatus);
 
   DateTime _lastModified = DateTime.fromMillisecondsSinceEpoch(0);
+  int _lastServerVersion = 0;
   bool _isInitialized = false;
 
   Future<void> initialize() async {
     if (_isInitialized) return;
 
     try {
-      final appDir = await getApplicationDocumentsDirectory();
-      _stateFile = File('${appDir.path}/wtf_local_state.json');
+      _seedDefaultData();
 
-      if (await _stateFile!.exists()) {
-        await _loadFromFile();
-      } else {
-        _seedDefaultData();
-        await _saveToFile();
+      // 1. Resolve shared state file path across desktop/mobile processes
+      if (!kIsWeb) {
+        try {
+          String? dirPath;
+          if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+            dirPath = Directory.systemTemp.path;
+          } else {
+            final appDir = await getApplicationDocumentsDirectory();
+            dirPath = appDir.path;
+          }
+
+          _stateFile = File('$dirPath/wtf_local_state.json');
+
+          if (await _stateFile!.exists()) {
+            await _loadFromFile();
+          } else {
+            await _saveToFile();
+          }
+        } catch (e) {
+          debugPrint('SyncBridge file storage init notice: $e');
+        }
       }
 
-      // Start reactive polling (every 250ms) to detect cross-process changes immediately
-      _pollingTimer = Timer.periodic(const Duration(milliseconds: 250), (_) => _checkForExternalChanges());
+      // 2. Fetch initial state from Token/Sync Server if reachable
+      await _syncWithServer();
+
+      // 3. Start reactive polling (every 400ms) on all platforms (Web, Desktop, Mobile)
+      _pollingTimer?.cancel();
+      _pollingTimer = Timer.periodic(const Duration(milliseconds: 400), (_) => _checkForExternalChanges());
 
       _isInitialized = true;
-      _logger.logAuth('SyncBridge initialized successfully', meta: {'path': _stateFile?.path});
+      _logger.logAuth('SyncBridge initialized successfully', meta: {
+        'isWeb': kIsWeb,
+        'path': _stateFile?.path,
+      });
     } catch (e) {
-      _logger.logAuth('SyncBridge local fallback initialization', meta: {'error': e.toString()});
+      _logger.logAuth('SyncBridge initialization fallback', meta: {'error': e.toString()});
       _seedDefaultData();
       _notifyAll();
+
+      _pollingTimer?.cancel();
+      _pollingTimer = Timer.periodic(const Duration(milliseconds: 400), (_) => _checkForExternalChanges());
       _isInitialized = true;
     }
   }
@@ -95,9 +123,11 @@ class SyncBridge {
   }
 
   Future<void> _loadFromFile() async {
-    if (_stateFile == null || !await _stateFile!.exists()) return;
+    if (kIsWeb || _stateFile == null) return;
 
     try {
+      if (!await _stateFile!.exists()) return;
+
       final stat = await _stateFile!.stat();
       _lastModified = stat.modified;
 
@@ -105,51 +135,92 @@ class SyncBridge {
       if (content.trim().isEmpty) return;
 
       final data = json.decode(content) as Map<String, dynamic>;
-
-      if (data['users'] != null) {
-        _users.clear();
-        for (final item in data['users'] as List) {
-          _users.add(User.fromMap(item as Map<String, dynamic>));
-        }
-      }
-
-      if (data['messages'] != null) {
-        _messages.clear();
-        for (final item in data['messages'] as List) {
-          _messages.add(Message.fromMap(item as Map<String, dynamic>));
-        }
-      }
-
-      if (data['callRequests'] != null) {
-        _callRequests.clear();
-        for (final item in data['callRequests'] as List) {
-          _callRequests.add(CallRequest.fromMap(item as Map<String, dynamic>));
-        }
-      }
-
-      if (data['sessionLogs'] != null) {
-        _sessionLogs.clear();
-        for (final item in data['sessionLogs'] as List) {
-          _sessionLogs.add(SessionLog.fromMap(item as Map<String, dynamic>));
-        }
-      }
-
-      if (data['typing'] != null) {
-        _typingStatus.clear();
-        final typingMap = data['typing'] as Map<String, dynamic>;
-        typingMap.forEach((key, value) {
-          _typingStatus[key] = value as bool;
-        });
-      }
-
-      _notifyAll();
+      _parseAndApplyState(data);
     } catch (e) {
       debugPrint('SyncBridge load error: $e');
     }
   }
 
+  void _parseAndApplyState(Map<String, dynamic> data) {
+    bool hasChanges = false;
+
+    if (data['users'] != null) {
+      final incomingUsers = (data['users'] as List)
+          .map((item) => User.fromMap(item as Map<String, dynamic>))
+          .toList();
+      for (final user in incomingUsers) {
+        final idx = _users.indexWhere((u) => u.id == user.id);
+        if (idx >= 0) {
+          _users[idx] = user;
+        } else {
+          _users.add(user);
+        }
+      }
+      hasChanges = true;
+    }
+
+    if (data['messages'] != null) {
+      final incomingMsgs = (data['messages'] as List)
+          .map((item) => Message.fromMap(item as Map<String, dynamic>))
+          .toList();
+      for (final msg in incomingMsgs) {
+        final idx = _messages.indexWhere((m) => m.id == msg.id);
+        if (idx >= 0) {
+          _messages[idx] = msg;
+        } else {
+          _messages.add(msg);
+        }
+      }
+      _messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      hasChanges = true;
+    }
+
+    if (data['callRequests'] != null) {
+      final incomingCalls = (data['callRequests'] as List)
+          .map((item) => CallRequest.fromMap(item as Map<String, dynamic>))
+          .toList();
+      for (final req in incomingCalls) {
+        final idx = _callRequests.indexWhere((r) => r.id == req.id);
+        if (idx >= 0) {
+          _callRequests[idx] = req;
+        } else {
+          _callRequests.add(req);
+        }
+      }
+      hasChanges = true;
+    }
+
+    if (data['sessionLogs'] != null) {
+      final incomingLogs = (data['sessionLogs'] as List)
+          .map((item) => SessionLog.fromMap(item as Map<String, dynamic>))
+          .toList();
+      for (final log in incomingLogs) {
+        final idx = _sessionLogs.indexWhere((s) => s.id == log.id);
+        if (idx >= 0) {
+          _sessionLogs[idx] = log;
+        } else {
+          _sessionLogs.add(log);
+        }
+      }
+      hasChanges = true;
+    }
+
+    if (data['typing'] != null) {
+      final typingMap = data['typing'] as Map<String, dynamic>;
+      typingMap.forEach((key, value) {
+        _typingStatus[key] = value as bool;
+      });
+      hasChanges = true;
+    }
+
+    if (hasChanges) {
+      _notifyAll();
+    }
+  }
+
   Future<void> _saveToFile() async {
-    if (_stateFile == null) return;
+    _notifyAll();
+    if (kIsWeb || _stateFile == null) return;
 
     try {
       final data = {
@@ -165,23 +236,53 @@ class SyncBridge {
       await _stateFile!.writeAsString(json.encode(data), flush: true);
       final stat = await _stateFile!.stat();
       _lastModified = stat.modified;
-      _notifyAll();
     } catch (e) {
       debugPrint('SyncBridge save error: $e');
     }
   }
 
-  Future<void> _checkForExternalChanges() async {
-    if (_stateFile == null || !await _stateFile!.exists()) return;
-
+  Future<void> _syncWithServer() async {
     try {
-      final stat = await _stateFile!.stat();
-      if (stat.modified.isAfter(_lastModified)) {
-        await _loadFromFile();
+      final uri = Uri.parse('${AppConfig.tokenServerUrl}/api/sync');
+      final response = await http.get(uri).timeout(const Duration(seconds: 1));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        final serverVer = data['version'] as int? ?? 0;
+        final serverMsgCount = (data['messages'] as List?)?.length ?? 0;
+        final serverCallCount = (data['callRequests'] as List?)?.length ?? 0;
+        final serverLogCount = (data['sessionLogs'] as List?)?.length ?? 0;
+
+        if (serverVer != _lastServerVersion ||
+            serverMsgCount != _messages.length ||
+            serverCallCount != _callRequests.length ||
+            serverLogCount != _sessionLogs.length ||
+            _messages.isEmpty) {
+          _lastServerVersion = serverVer;
+          _parseAndApplyState(data);
+          await _saveToFile();
+        }
       }
-    } catch (e) {
-      // Ignored for resilience
+    } catch (_) {
+      // Server offline - purely local mode continues seamlessly
     }
+  }
+
+  Future<void> _checkForExternalChanges() async {
+    // 1. Check local file modification (native desktop/mobile only)
+    if (!kIsWeb && _stateFile != null) {
+      try {
+        if (await _stateFile!.exists()) {
+          final stat = await _stateFile!.stat();
+          if (stat.modified.isAfter(_lastModified)) {
+            await _loadFromFile();
+          }
+        }
+      } catch (_) {}
+    }
+
+    // 2. Periodic HTTP sync with Token Server (all platforms including Chrome/Web)
+    await _syncWithServer();
   }
 
   void _notifyAll() {
@@ -192,7 +293,7 @@ class SyncBridge {
     _typingController.add(Map.unmodifiable(_typingStatus));
   }
 
-  // --- CRUD Mutations with instant save & broadcast ---
+  // --- CRUD Mutations with instant save & broadcast & server sync ---
 
   Future<void> saveUser(User user) async {
     final index = _users.indexWhere((u) => u.id == user.id);
@@ -202,11 +303,41 @@ class SyncBridge {
       _users.add(user);
     }
     await _saveToFile();
+
+    // Async push user to server
+    try {
+      final uri = Uri.parse('${AppConfig.tokenServerUrl}/api/sync/user');
+      http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: user.toJson(),
+      ).timeout(const Duration(milliseconds: 800)).ignore();
+    } catch (_) {}
   }
 
   Future<void> addMessage(Message message) async {
     _messages.add(message);
+    _notifyAll();
     await _saveToFile();
+
+    // Async push to server
+    try {
+      final uri = Uri.parse('${AppConfig.tokenServerUrl}/api/sync/message');
+      http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: message.toJson(),
+      ).then((res) {
+        if (res.statusCode == 200) {
+          try {
+            final data = json.decode(res.body) as Map<String, dynamic>;
+            if (data['version'] != null) {
+              _lastServerVersion = data['version'] as int;
+            }
+          } catch (_) {}
+        }
+      }).catchError((_) {});
+    } catch (_) {}
   }
 
   Future<void> updateMessageStatus(String messageId, MessageStatus status) async {
@@ -217,10 +348,14 @@ class SyncBridge {
     }
   }
 
-  Future<void> markMessagesAsRead({required String chatId, required String currentUserId}) async {
+  Future<void> markMessagesAsRead({required String chatId, required String currentUserId, String? otherUserId}) async {
     bool hasChanges = false;
     for (int i = 0; i < _messages.length; i++) {
-      if (_messages[i].chatId == chatId &&
+      final matchesChat = _messages[i].chatId == chatId ||
+          (otherUserId != null &&
+              ((_messages[i].senderId == currentUserId && _messages[i].receiverId == otherUserId) ||
+                  (_messages[i].senderId == otherUserId && _messages[i].receiverId == currentUserId)));
+      if (matchesChat &&
           _messages[i].receiverId == currentUserId &&
           _messages[i].status != MessageStatus.read) {
         _messages[i] = _messages[i].copyWith(status: MessageStatus.read);
@@ -229,17 +364,48 @@ class SyncBridge {
     }
     if (hasChanges) {
       await _saveToFile();
+
+      try {
+        final uri = Uri.parse('${AppConfig.tokenServerUrl}/api/sync/read');
+        http.post(
+          uri,
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({
+            'chatId': chatId,
+            'currentUserId': currentUserId,
+            if (otherUserId != null) 'otherUserId': otherUserId,
+          }),
+        ).timeout(const Duration(milliseconds: 800)).ignore();
+      } catch (_) {}
     }
   }
 
   Future<void> setTypingStatus(String userId, bool isTyping) async {
     _typingStatus[userId] = isTyping;
-    await _saveToFile();
+    _typingController.add(Map.unmodifiable(_typingStatus));
+
+    try {
+      final uri = Uri.parse('${AppConfig.tokenServerUrl}/api/sync/typing');
+      http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'userId': userId, 'isTyping': isTyping}),
+      ).timeout(const Duration(milliseconds: 800)).ignore();
+    } catch (_) {}
   }
 
   Future<void> addCallRequest(CallRequest request) async {
     _callRequests.add(request);
     await _saveToFile();
+
+    try {
+      final uri = Uri.parse('${AppConfig.tokenServerUrl}/api/sync/call_request');
+      http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: request.toJson(),
+      ).timeout(const Duration(milliseconds: 800)).ignore();
+    } catch (_) {}
   }
 
   Future<void> updateCallRequest(CallRequest request) async {
@@ -247,12 +413,30 @@ class SyncBridge {
     if (index >= 0) {
       _callRequests[index] = request;
       await _saveToFile();
+
+      try {
+        final uri = Uri.parse('${AppConfig.tokenServerUrl}/api/sync/call_request');
+        http.post(
+          uri,
+          headers: {'Content-Type': 'application/json'},
+          body: request.toJson(),
+        ).timeout(const Duration(milliseconds: 800)).ignore();
+      } catch (_) {}
     }
   }
 
   Future<void> addSessionLog(SessionLog log) async {
-    _sessionLogs.insert(0, log); // latest on top
+    _sessionLogs.insert(0, log);
     await _saveToFile();
+
+    try {
+      final uri = Uri.parse('${AppConfig.tokenServerUrl}/api/sync/session_log');
+      http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: log.toJson(),
+      ).timeout(const Duration(milliseconds: 800)).ignore();
+    } catch (_) {}
   }
 
   Future<void> updateSessionLog(SessionLog log) async {
@@ -260,6 +444,15 @@ class SyncBridge {
     if (index >= 0) {
       _sessionLogs[index] = log;
       await _saveToFile();
+
+      try {
+        final uri = Uri.parse('${AppConfig.tokenServerUrl}/api/sync/session_log');
+        http.post(
+          uri,
+          headers: {'Content-Type': 'application/json'},
+          body: log.toJson(),
+        ).timeout(const Duration(milliseconds: 800)).ignore();
+      } catch (_) {}
     }
   }
 

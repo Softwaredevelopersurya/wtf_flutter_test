@@ -1,16 +1,26 @@
 {
-  "name": "wtf-100ms-token-server",
+  "name": "wtf-agora-token-server",
   "version": "1.0.0",
-  "description": "Minimal 100ms Auth Token Server for Guru & Trainer Apps",
+  "description": "Minimal Agora RTC & Messaging Token Server for Guru & Trainer Apps",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "kill": "powershell -Command \"$p = (Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue).OwningProcess; if ($p -and $p -ne 0) { Stop-Process -Id $p -Force; Write-Host \\\"Killed PID $p\\\" } else { Write-Host \\\"Port 8080 is free\\\" }\"",
+    "restart": "npm run kill && npm start"
   },
-  "keywords": ["100ms", "webrtc", "flutter", "token-server"],
+  "keywords": [
+    "agora",
+    "rtc",
+    "video",
+    "chat",
+    "flutter",
+    "token-server"
+  ],
   "author": "Antigravity Engineer",
   "license": "MIT",
   "dependencies": {
+    "agora-token": "^2.0.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",

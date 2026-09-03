@@ -1,0 +1,366 @@
+{
+  "version": 49,
+  "updatedAt": "2026-09-03T13:03:38.710Z",
+  "users": [
+    {
+      "id": "user_trainer_aarav",
+      "role": "trainer",
+      "name": "Aarav (Lead Trainer)",
+      "email": "aarav.trainer@wtf.fitness",
+      "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"
+    },
+    {
+      "id": "user_member_dk",
+      "role": "member",
+      "name": "DK",
+      "email": "dk.member@wtf.fitness",
+      "avatarUrl": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150",
+      "assignedTrainerId": "user_trainer_aarav"
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg_test_1",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_member_dk",
+      "receiverId": "user_trainer_aarav",
+      "text": "Hi coach, can we review my workout plan?",
+      "createdAt": "2026-09-03T10:12:58.723Z",
+      "status": "read"
+    },
+    {
+      "id": "msg_3e7db56a",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_member_dk",
+      "receiverId": "user_trainer_aarav",
+      "text": "Hi Coach 👍",
+      "createdAt": "2026-09-03T16:07:28.131",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_18bf633d",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_trainer_aarav",
+      "receiverId": "user_member_dk",
+      "text": "Hi DK, ready for this week’s coaching plan?",
+      "createdAt": "2026-09-03T16:07:41.895",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_412ecefe",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_trainer_aarav",
+      "receiverId": "user_member_dk",
+      "text": "Great form! 👍",
+      "createdAt": "2026-09-03T16:11:11.700",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_82ef2961",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_member_dk",
+      "receiverId": "user_trainer_aarav",
+      "text": "Can we talk at 6?",
+      "createdAt": "2026-09-03T16:11:20.418",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_85a22acd",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_trainer_aarav",
+      "receiverId": "user_member_dk",
+      "text": "Hi DK, ready for this week’s coaching plan?",
+      "createdAt": "2026-09-03T16:13:55.663",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_b95d5721",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_member_dk",
+      "receiverId": "user_trainer_aarav",
+      "text": "Hi Coach 👍",
+      "createdAt": "2026-09-03T16:14:01.330",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_6051bdf4",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_trainer_aarav",
+      "receiverId": "user_member_dk",
+      "text": "Check updated workout",
+      "createdAt": "2026-09-03T16:14:04.674",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_00b490b3",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_member_dk",
+      "receiverId": "user_trainer_aarav",
+      "text": "Can we talk at 6?",
+      "createdAt": "2026-09-03T16:14:06.400",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_d2dcb8d7",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_trainer_aarav",
+      "receiverId": "user_member_dk",
+      "text": "Hi DK, ready for this week’s coaching plan?",
+      "createdAt": "2026-09-03T16:26:41.588",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_449b4186",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_member_dk",
+      "receiverId": "user_trainer_aarav",
+      "text": "Hi Coach 👍",
+      "createdAt": "2026-09-03T16:26:47.579",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_55b07b14",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_trainer_aarav",
+      "receiverId": "user_member_dk",
+      "text": "Check updated workout",
+      "createdAt": "2026-09-03T16:26:54.959",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_1254c4f8",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_member_dk",
+      "receiverId": "user_trainer_aarav",
+      "text": "Can we talk at 6?",
+      "createdAt": "2026-09-03T16:26:56.359",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_a2a79cca",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_member_dk",
+      "receiverId": "user_trainer_aarav",
+      "text": "hi",
+      "createdAt": "2026-09-03T16:33:23.940",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_489d5c0a",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_trainer_aarav",
+      "receiverId": "user_member_dk",
+      "text": "hello",
+      "createdAt": "2026-09-03T16:33:31.768",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_f75e4047",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_trainer_aarav",
+      "receiverId": "user_member_dk",
+      "text": "Here is your revised workout routine for this week.",
+      "createdAt": "2026-09-03T16:57:07.845",
+      "status": "read",
+      "attachmentUrl": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=400"
+    },
+    {
+      "id": "msg_6babfe07",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_member_dk",
+      "receiverId": "user_trainer_aarav",
+      "text": "Sharing my meal photo today!",
+      "createdAt": "2026-09-03T16:57:31.202",
+      "status": "read",
+      "attachmentUrl": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400"
+    },
+    {
+      "id": "msg_9988c478",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_trainer_aarav",
+      "receiverId": "user_member_dk",
+      "text": "Call approved for 11:13 AM (Agora Channel: wtf_flutter_test)",
+      "createdAt": "2026-09-03T17:00:10.025",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_3798bea4",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_trainer_aarav",
+      "receiverId": "user_member_dk",
+      "text": "Call approved for 5:00 PM (Agora Channel: wtf_flutter_test)",
+      "createdAt": "2026-09-03T17:00:22.192",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_3d1e7918",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_trainer_aarav",
+      "receiverId": "user_member_dk",
+      "text": "hi",
+      "createdAt": "2026-09-03T18:31:34.731",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_34da1e9d",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_member_dk",
+      "receiverId": "user_trainer_aarav",
+      "text": "hello",
+      "createdAt": "2026-09-03T18:31:44.012",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_b5a34ed2",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_member_dk",
+      "receiverId": "user_trainer_aarav",
+      "text": "I am ready",
+      "createdAt": "2026-09-03T18:32:04.406",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_209fb167",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_trainer_aarav",
+      "receiverId": "user_member_dk",
+      "text": "thanks",
+      "createdAt": "2026-09-03T18:32:20.744",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_273ae4bd",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_member_dk",
+      "receiverId": "user_trainer_aarav",
+      "text": "Sharing my meal photo today!",
+      "createdAt": "2026-09-03T18:32:25.673",
+      "status": "read",
+      "attachmentUrl": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400"
+    },
+    {
+      "id": "msg_eb7fc503",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_trainer_aarav",
+      "receiverId": "user_member_dk",
+      "text": "Here is your revised workout routine for this week.",
+      "createdAt": "2026-09-03T18:32:29.570",
+      "status": "read",
+      "attachmentUrl": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=400"
+    },
+    {
+      "id": "msg_6d6be888",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_trainer_aarav",
+      "receiverId": "user_member_dk",
+      "text": "Call approved for 7:00 PM (Agora Channel: wtf_flutter_test)",
+      "createdAt": "2026-09-03T18:33:16.005",
+      "status": "read",
+      "attachmentUrl": null
+    },
+    {
+      "id": "msg_c79e7225",
+      "chatId": "user_member_dk_user_trainer_aarav",
+      "senderId": "user_trainer_aarav",
+      "receiverId": "user_member_dk",
+      "text": "Call request declined. Reason: Schedule conflict, please pick another slot",
+      "createdAt": "2026-09-03T18:33:26.094",
+      "status": "read",
+      "attachmentUrl": null
+    }
+  ],
+  "callRequests": [
+    {
+      "id": "call_test_1",
+      "memberId": "user_member_dk",
+      "trainerId": "user_trainer_aarav",
+      "requestedAt": "2026-09-03T10:13:05.294Z",
+      "scheduledFor": "2026-09-03T11:13:05.294Z",
+      "note": "Macros review",
+      "status": "approved",
+      "declineReason": null,
+      "roomId": "wtf_flutter_test"
+    },
+    {
+      "id": "call_0076128d",
+      "memberId": "user_member_dk",
+      "trainerId": "user_trainer_aarav",
+      "requestedAt": "2026-09-03T16:59:59.547",
+      "scheduledFor": "2026-09-03T17:00:00.000",
+      "note": "Macros review",
+      "status": "approved",
+      "declineReason": null,
+      "roomId": "wtf_flutter_test"
+    },
+    {
+      "id": "call_9d5a10e4",
+      "memberId": "user_member_dk",
+      "trainerId": "user_trainer_aarav",
+      "requestedAt": "2026-09-03T18:28:18.956",
+      "scheduledFor": "2026-09-03T18:30:00.000",
+      "note": "Macros review",
+      "status": "declined",
+      "declineReason": "Schedule conflict, please pick another slot",
+      "roomId": null
+    },
+    {
+      "id": "call_1396b1d8",
+      "memberId": "user_member_dk",
+      "trainerId": "user_trainer_aarav",
+      "requestedAt": "2026-09-03T18:32:46.811",
+      "scheduledFor": "2026-09-03T19:00:00.000",
+      "note": "Macros review",
+      "status": "approved",
+      "declineReason": null,
+      "roomId": "wtf_flutter_test"
+    }
+  ],
+  "sessionLogs": [
+    {
+      "id": "log_f8688c36",
+      "memberId": "user_member_dk",
+      "trainerId": "user_trainer_aarav",
+      "startedAt": "2026-09-03T18:24:09.712",
+      "endedAt": "2026-09-03T18:24:51.836",
+      "durationSec": 42,
+      "rating": null,
+      "trainerNotes": "",
+      "memberNotes": null
+    },
+    {
+      "id": "log_396ec5f5",
+      "memberId": "user_member_dk",
+      "trainerId": "user_trainer_aarav",
+      "startedAt": "2026-09-03T18:24:07.880",
+      "endedAt": "2026-09-03T18:24:44.564",
+      "durationSec": 36,
+      "rating": 5,
+      "trainerNotes": null,
+      "memberNotes": ""
+    }
+  ],
+  "typing": {
+    "user_member_dk": false,
+    "user_trainer_aarav": false
+  }
+}

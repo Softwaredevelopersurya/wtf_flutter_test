@@ -146,6 +146,17 @@ class _TrainerRequestsScreenState extends State<TrainerRequestsScreen> {
                         itemCount: displayList.length,
                         itemBuilder: (context, index) {
                           final req = displayList[index];
+                          final member = vm.members.firstWhere(
+                            (m) => m.id == req.memberId,
+                            orElse: () => const User(
+                              id: 'user_member_dk',
+                              role: UserRole.member,
+                              name: 'DK',
+                              email: 'dk.member@wtf.fitness',
+                              avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150',
+                            ),
+                          );
+
                           return Card(
                             margin: const EdgeInsets.only(bottom: 12),
                             child: Padding(
@@ -156,14 +167,15 @@ class _TrainerRequestsScreenState extends State<TrainerRequestsScreen> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      const Row(
+                                      Row(
                                         children: [
                                           CircleAvatar(
                                             radius: 16,
-                                            backgroundImage: NetworkImage('https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150'),
+                                            backgroundImage: member.avatarUrl != null ? NetworkImage(member.avatarUrl!) : null,
+                                            child: member.avatarUrl == null ? Text(member.name[0]) : null,
                                           ),
                                           AppSpacing.gapH8,
-                                          Text('DK (Member)', style: AppTypography.bodyMediumSemiBold),
+                                          Text('${member.name} (Member)', style: AppTypography.bodyMediumSemiBold),
                                         ],
                                       ),
                                       _buildStatusBadge(req.status),

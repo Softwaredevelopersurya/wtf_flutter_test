@@ -76,8 +76,9 @@ class TrainerMembersScreen extends StatelessWidget {
                               icon: const Icon(Icons.chat_bubble_outline_rounded, size: 16),
                               label: const Text('Open Chat'),
                               onPressed: () {
+                                vm.setSelectedMember(member);
                                 Navigator.of(context).push(
-                                  MaterialPageRoute(builder: (_) => const TrainerChatScreen()),
+                                  MaterialPageRoute(builder: (_) => TrainerChatScreen(targetMember: member)),
                                 );
                               },
                             ),

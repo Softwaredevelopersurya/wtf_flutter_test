@@ -58,11 +58,44 @@ void main() {
       expect(req.isPending, isTrue);
       expect(req.isApproved, isFalse);
 
-      final approved = req.copyWith(status: CallRequestStatus.approved, roomId: 'room_100ms_abc');
+      final approved = req.copyWith(status: CallRequestStatus.approved, roomId: 'channel_agora_abc');
       expect(approved.isApproved, isTrue);
-      expect(approved.roomId, 'room_100ms_abc');
+      expect(approved.roomId, 'channel_agora_abc');
+    });
+
+    test('Agora RoomMeta and AgoraInCallMessage serialization tests', () {
+      const room = RoomMeta(
+        id: 'meta_1',
+        callRequestId: 'req_1',
+        channelName: 'channel_agora_123',
+        agoraRoleMember: 'broadcaster',
+        agoraRoleTrainer: 'publisher',
+      );
+
+      final map = room.toMap();
+      expect(map['channelName'], 'channel_agora_123');
+      expect(map['agoraRoleMember'], 'broadcaster');
+
+      final deserialized = RoomMeta.fromMap(map);
+      expect(deserialized.channelName, 'channel_agora_123');
+      expect(deserialized.hmsRoomId, 'channel_agora_123');
+
+      final msg = AgoraInCallMessage(
+        id: 'msg_1',
+        senderId: 'u1',
+        senderName: 'DK',
+        message: 'Let us begin form checks',
+        timestamp: DateTime.now(),
+      );
+
+      final msgMap = msg.toMap();
+      expect(msgMap['senderName'], 'DK');
+      expect(msgMap['message'], 'Let us begin form checks');
+      final deserializedMsg = AgoraInCallMessage.fromMap(msgMap);
+      expect(deserializedMsg.message, msg.message);
     });
   });
+
 
   group('Scheduler Validation Tests (Minimum Quality Gate)', () {
     test('Validation rejects past scheduled times', () {

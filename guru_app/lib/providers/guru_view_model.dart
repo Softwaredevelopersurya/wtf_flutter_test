@@ -24,7 +24,11 @@ class GuruViewModel extends ChangeNotifier {
   bool get isOnboarded => _isOnboarded;
 
   List<Message> get messages => _currentUser != null && _assignedTrainer != null
-      ? _chat.getMessagesForChat('${_currentUser!.id}_${_assignedTrainer!.id}')
+      ? _chat.getMessagesForChat(
+          '${_currentUser!.id}_${_assignedTrainer!.id}',
+          user1Id: _currentUser!.id,
+          user2Id: _assignedTrainer!.id,
+        )
       : [];
 
   List<CallRequest> get myRequests => _currentUser != null
@@ -45,12 +49,17 @@ class GuruViewModel extends ChangeNotifier {
     return _chat.getUnreadCount(
       chatId: '${_currentUser!.id}_${_assignedTrainer!.id}',
       currentUserId: _currentUser!.id,
+      otherUserId: _assignedTrainer!.id,
     );
   }
 
   Message? get lastChatMessage {
     if (_currentUser == null || _assignedTrainer == null) return null;
-    return _chat.getLastMessage('${_currentUser!.id}_${_assignedTrainer!.id}');
+    return _chat.getLastMessage(
+      '${_currentUser!.id}_${_assignedTrainer!.id}',
+      user1Id: _currentUser!.id,
+      user2Id: _assignedTrainer!.id,
+    );
   }
 
   CallRequest? get nextUpcomingApprovedCall {
@@ -127,6 +136,7 @@ class GuruViewModel extends ChangeNotifier {
     await _chat.markAsRead(
       chatId: '${_currentUser!.id}_${_assignedTrainer!.id}',
       currentUserId: _currentUser!.id,
+      otherUserId: _assignedTrainer!.id,
     );
   }
 

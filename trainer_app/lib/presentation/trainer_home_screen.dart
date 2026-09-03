@@ -12,7 +12,17 @@ class TrainerHomeScreen extends StatelessWidget {
   const TrainerHomeScreen({super.key});
 
   void _startTrainerVideoCall(BuildContext context, TrainerViewModel vm, CallRequest callReq) {
-    if (vm.currentUser == null || vm.primaryMember == null) return;
+    if (vm.currentUser == null) return;
+
+    final caller = vm.members.firstWhere(
+      (m) => m.id == callReq.memberId,
+      orElse: () => vm.activeMember ?? vm.primaryMember ?? User(
+        id: callReq.memberId,
+        role: UserRole.member,
+        name: 'Member',
+        email: 'member@wtf.fitness',
+      ),
+    );
 
     showModalBottomSheet(
       context: context,
@@ -26,7 +36,7 @@ class TrainerHomeScreen extends StatelessWidget {
             MaterialPageRoute(
               builder: (_) => ActiveVideoCallScreen(
                 currentUser: vm.currentUser!,
-                peerUser: vm.primaryMember!,
+                peerUser: caller,
                 callRequest: callReq,
                 onCallEnded: (startedAt, endedAt) async {
                   // End call -> Auto write SessionLog
@@ -236,6 +246,16 @@ class TrainerHomeScreen extends StatelessWidget {
   }
 
   Widget _buildUpcomingCallBanner(BuildContext context, TrainerViewModel vm, CallRequest callReq) {
+    final caller = vm.members.firstWhere(
+      (m) => m.id == callReq.memberId,
+      orElse: () => vm.activeMember ?? vm.primaryMember ?? const User(
+        id: 'user_member_dk',
+        role: UserRole.member,
+        name: 'DK',
+        email: 'dk.member@wtf.fitness',
+      ),
+    );
+
     return Container(
       padding: AppSpacing.paddingMd,
       decoration: BoxDecoration(
@@ -281,7 +301,7 @@ class TrainerHomeScreen extends StatelessWidget {
           ),
           AppSpacing.gapV12,
           Text(
-            'Member: DK • Topic: "${callReq.note}"',
+            'Member: ${caller.name} • Topic: "${callReq.note}"',
             style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
           ),
           AppSpacing.gapV12,
@@ -360,22 +380,34 @@ class TrainerHomeScreen extends StatelessWidget {
   }
 
   Widget _buildQuickRequestCard(BuildContext context, TrainerViewModel vm, CallRequest req) {
+    final member = vm.members.firstWhere(
+      (m) => m.id == req.memberId,
+      orElse: () => const User(
+        id: 'user_member_dk',
+        role: UserRole.member,
+        name: 'DK',
+        email: 'dk.member@wtf.fitness',
+        avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150',
+      ),
+    );
+
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: Padding(
         padding: AppSpacing.paddingMd,
         child: Row(
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 18,
-              backgroundImage: NetworkImage('https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150'),
+              backgroundImage: member.avatarUrl != null ? NetworkImage(member.avatarUrl!) : null,
+              child: member.avatarUrl == null ? Text(member.name[0]) : null,
             ),
             AppSpacing.gapH12,
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('DK (Member)', style: AppTypography.bodyMediumSemiBold),
+                  Text('${member.name} (Member)', style: AppTypography.bodyMediumSemiBold),
                   Text(
                     '${Formatters.formatFriendlyDateTime(req.scheduledFor)}: "${req.note}"',
                     style: AppTypography.bodySmall,

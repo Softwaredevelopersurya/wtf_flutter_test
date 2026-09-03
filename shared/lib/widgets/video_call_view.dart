@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:hmssdk_flutter/hmssdk_flutter.dart';
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import '../models/models.dart';
 import '../services/log_service.dart';
 import '../services/call_service.dart';
-import '../services/hms_sdk_service.dart';
+import '../services/agora_sdk_service.dart';
+import '../utils/app_config.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_spacing.dart';
 import '../utils/app_strings.dart';
@@ -55,7 +56,7 @@ class _PreJoinDeviceCheckModalState extends State<PreJoinDeviceCheckModal> {
                 style: AppTypography.h2.copyWith(color: AppColors.darkText),
               ),
               CustomBadge(
-                text: isTrainer ? '100ms Role: Trainer' : '100ms Role: Member',
+                text: isTrainer ? 'Agora Role: Trainer' : 'Agora Role: Member',
                 backgroundColor: primaryColor,
               ),
             ],
@@ -115,7 +116,7 @@ class _PreJoinDeviceCheckModalState extends State<PreJoinDeviceCheckModal> {
                                 ),
                                 AppSpacing.gapH4,
                                 Text(
-                                  '100ms HD Video & Audio Ready',
+                                  'Agora HD Video & Audio Ready',
                                   style: TextStyle(fontSize: 11, color: Colors.green.shade300),
                                 ),
                               ],
@@ -208,7 +209,7 @@ class _PreJoinDeviceCheckModalState extends State<PreJoinDeviceCheckModal> {
   }
 }
 
-/// Active In-Call Video Conference Screen (100ms Grid Layout & RTC Chat)
+/// Active In-Call Video Conference Screen (Agora RTC Engine Grid Layout & Real-Time Stream Chat)
 class ActiveVideoCallScreen extends StatefulWidget {
   final User currentUser;
   final User peerUser;
@@ -230,7 +231,7 @@ class ActiveVideoCallScreen extends StatefulWidget {
 class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
   final LogService _logger = LogService();
   final CallService _callService = CallService();
-  final HMSSdkService _hmsSdkService = HMSSdkService();
+  final AgoraSdkService _agoraSdkService = AgoraSdkService();
 
   late DateTime _callStartedAt;
   Timer? _durationTimer;
@@ -252,19 +253,24 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
       if (mounted) setState(() => _elapsedSeconds++);
     });
 
-    _join100msRoom();
+    _joinAgoraChannel();
   }
 
-  Future<void> _join100msRoom() async {
-    final roomId = widget.callRequest.roomId ?? 'room_live_01';
-    final token = await _callService.fetch100msAuthToken(
+  Future<void> _joinAgoraChannel() async {
+    final channelName = widget.callRequest.roomId ?? AppConfig.agoraDefaultChannel;
+    const uid = 0;
+
+    final token = await _callService.fetchAgoraToken(
       userId: widget.currentUser.id,
-      role: widget.currentUser.role.name,
-      roomId: roomId,
+      channelName: channelName,
+      uid: uid,
+      role: widget.currentUser.role == UserRole.trainer ? 'publisher' : 'broadcaster',
     );
 
-    await _hmsSdkService.joinRoom(
-      authToken: token,
+    await _agoraSdkService.joinChannel(
+      channelName: channelName,
+      token: token,
+      uid: uid,
       userName: widget.currentUser.name,
     );
   }
@@ -284,12 +290,12 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
 
   void _simulateNetworkGlitch() {
     setState(() => _isReconnecting = true);
-    _logger.logRtc('Network glitch detected: 100ms auto-reconnecting...', isError: true);
+    _logger.logRtc('Network glitch detected: Agora auto-reconnecting...', isError: true);
 
     Timer(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() => _isReconnecting = false);
-        _logger.logRtc('100ms connection successfully restored');
+        _logger.logRtc('Agora connection successfully restored');
       }
     });
   }
@@ -299,9 +305,9 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
     _durationTimer?.cancel();
 
     if (widget.currentUser.role == UserRole.trainer) {
-      await _hmsSdkService.endRoomForAll();
+      await _agoraSdkService.endRoomForAll();
     } else {
-      await _hmsSdkService.leaveRoom();
+      await _agoraSdkService.leaveChannel();
     }
 
     await widget.onCallEnded(_callStartedAt, callEndedAt);
@@ -310,13 +316,18 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
   void _sendInCallMessage() {
     final text = _inCallMsgController.text.trim();
     if (text.isEmpty) return;
-    _hmsSdkService.sendInCallMessage(text);
+    _agoraSdkService.sendInCallMessage(
+      text,
+      senderName: widget.currentUser.name,
+      senderId: widget.currentUser.id,
+    );
     _inCallMsgController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
     final isTrainer = widget.currentUser.role == UserRole.trainer;
+    final channelName = widget.callRequest.roomId ?? 'channel_agora_live_01';
 
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
@@ -355,7 +366,7 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
                       AppSpacing.gapH12,
                       Expanded(
                         child: Text(
-                          '100ms Room: ${widget.callRequest.roomId ?? "room_live"}',
+                          'Agora Channel: $channelName',
                           style: AppTypography.bodySmall.copyWith(color: AppColors.darkTextMuted),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -366,7 +377,7 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
                           color: Colors.white,
                           size: 20,
                         ),
-                        tooltip: 'In-Call 100ms Chat',
+                        tooltip: 'In-Call Agora Chat',
                         onPressed: () => setState(() => _showInCallChat = !_showInCallChat),
                       ),
                       IconButton(
@@ -380,39 +391,39 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
 
                 // 2-Participant Video Grid
                 Expanded(
-                  child: StreamBuilder<List<HMSPeer>>(
-                    stream: _hmsSdkService.peersStream,
+                  child: StreamBuilder<List<AgoraPeer>>(
+                    stream: _agoraSdkService.peersStream,
                     builder: (context, snapshot) {
-                      final localPeer = _hmsSdkService.localPeer;
-                      final remotePeers = _hmsSdkService.remotePeers;
+                      final remotePeers = _agoraSdkService.remotePeers;
                       final remotePeer = remotePeers.isNotEmpty ? remotePeers.first : null;
-
-                      final localTrack = localPeer?.videoTrack;
-                      final remoteTrack = remotePeer?.videoTrack;
+                      final remoteUid = _agoraSdkService.remoteUids.isNotEmpty
+                          ? _agoraSdkService.remoteUids.first
+                          : null;
 
                       return Padding(
                         padding: AppSpacing.paddingSm,
                         child: Column(
                           children: [
-                            // Peer Tile
+                            // Peer Tile (Remote)
                             Expanded(
                               child: _buildParticipantTile(
                                 user: widget.peerUser,
                                 isSelf: false,
-                                isVideoOff: remoteTrack?.isMute ?? false,
-                                isMuted: remotePeer?.audioTrack?.isMute ?? false,
-                                videoTrack: remoteTrack,
+                                isVideoOff: remotePeer?.isVideoMuted ?? false,
+                                isMuted: remotePeer?.isAudioMuted ?? false,
+                                remoteUid: remoteUid,
+                                channelId: channelName,
                               ),
                             ),
                             AppSpacing.gapV8,
-                            // Self Tile
+                            // Self Tile (Local)
                             Expanded(
                               child: _buildParticipantTile(
                                 user: widget.currentUser,
                                 isSelf: true,
-                                isVideoOff: _isVideoDisabled || (localTrack?.isMute ?? false),
+                                isVideoOff: _isVideoDisabled,
                                 isMuted: _isMicMuted,
-                                videoTrack: localTrack,
+                                channelId: channelName,
                               ),
                             ),
                           ],
@@ -438,8 +449,8 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
                         label: _isMicMuted ? 'Unmute' : 'Mute',
                         isActive: !_isMicMuted,
                         onTap: () async {
-                          await _hmsSdkService.toggleMic();
-                          setState(() => _isMicMuted = _hmsSdkService.isMicMuted);
+                          await _agoraSdkService.toggleMic();
+                          setState(() => _isMicMuted = _agoraSdkService.isMicMuted);
                         },
                       ),
 
@@ -449,19 +460,19 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
                         label: _isVideoDisabled ? 'Start Video' : 'Stop Video',
                         isActive: !_isVideoDisabled,
                         onTap: () async {
-                          await _hmsSdkService.toggleCamera();
-                          setState(() => _isVideoDisabled = _hmsSdkService.isVideoMuted);
+                          await _agoraSdkService.toggleCamera();
+                          setState(() => _isVideoDisabled = _agoraSdkService.isVideoMuted);
                         },
                       ),
 
                       // Flip Camera
                       _buildControlButton(
                         icon: Icons.flip_camera_ios_rounded,
-                        label: 'Flip',
-                        isActive: true,
+                        label: _isFrontCamera ? 'Flip' : 'Front',
+                        isActive: _isFrontCamera,
                         onTap: () async {
-                          await _hmsSdkService.switchCamera();
-                          setState(() => _isFrontCamera = !_isFrontCamera);
+                          await _agoraSdkService.switchCamera();
+                          setState(() => _isFrontCamera = _agoraSdkService.isFrontCamera);
                         },
                       ),
 
@@ -489,7 +500,7 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
                       const CircularProgressIndicator(color: AppColors.warning),
                       AppSpacing.gapV16,
                       Text(
-                        'Reconnecting to 100ms RTC...',
+                        'Reconnecting to Agora RTC...',
                         style: AppTypography.h3.copyWith(color: Colors.white),
                       ),
                       AppSpacing.gapV4,
@@ -515,14 +526,14 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
       child: Column(
         children: [
           Expanded(
-            child: StreamBuilder<List<HMSMessage>>(
-              stream: _hmsSdkService.inCallMessagesStream,
-              initialData: _hmsSdkService.inCallMessages,
+            child: StreamBuilder<List<AgoraInCallMessage>>(
+              stream: _agoraSdkService.inCallMessagesStream,
+              initialData: _agoraSdkService.inCallMessages,
               builder: (context, snapshot) {
                 final msgs = snapshot.data ?? [];
                 if (msgs.isEmpty) {
                   return Center(
-                    child: Text('No in-call 100ms messages yet.', style: AppTypography.caption.copyWith(color: AppColors.darkTextMuted)),
+                    child: Text('No in-call Agora messages yet.', style: AppTypography.caption.copyWith(color: AppColors.darkTextMuted)),
                   );
                 }
                 return ListView.builder(
@@ -530,7 +541,7 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
                   itemBuilder: (context, index) {
                     final msg = msgs[index];
                     return Text(
-                      '${msg.sender?.name ?? "Participant"}: ${msg.message}',
+                      '${msg.senderName}: ${msg.message}',
                       style: const TextStyle(fontSize: 12, color: Colors.white),
                     );
                   },
@@ -545,7 +556,7 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
                   controller: _inCallMsgController,
                   style: const TextStyle(color: Colors.white, fontSize: 13),
                   decoration: const InputDecoration(
-                    hintText: 'Type in-call 100ms message...',
+                    hintText: 'Type in-call Agora message...',
                     contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   ),
                   onSubmitted: (_) => _sendInCallMessage(),
@@ -567,9 +578,11 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
     required bool isSelf,
     required bool isVideoOff,
     required bool isMuted,
-    HMSVideoTrack? videoTrack,
+    int? remoteUid,
+    required String channelId,
   }) {
     final roleColor = user.role == UserRole.trainer ? AppColors.trainerPrimary : AppColors.guruPrimary;
+    final rtcEngine = _agoraSdkService.engine;
 
     return Container(
       decoration: BoxDecoration(
@@ -579,12 +592,25 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
       ),
       child: Stack(
         children: [
-          if (!isVideoOff && videoTrack != null)
+          if (!isVideoOff && rtcEngine != null && isSelf)
             ClipRRect(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              child: HMSVideoView(
-                track: videoTrack,
-                scaleType: ScaleType.SCALE_ASPECT_FILL,
+              child: AgoraVideoView(
+                controller: VideoViewController(
+                  rtcEngine: rtcEngine,
+                  canvas: const VideoCanvas(uid: 0),
+                ),
+              ),
+            )
+          else if (!isVideoOff && rtcEngine != null && !isSelf && remoteUid != null)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              child: AgoraVideoView(
+                controller: VideoViewController.remote(
+                  rtcEngine: rtcEngine,
+                  canvas: VideoCanvas(uid: remoteUid),
+                  connection: RtcConnection(channelId: channelId),
+                ),
               ),
             )
           else if (!isVideoOff)
@@ -611,7 +637,7 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
                             decoration: const BoxDecoration(color: AppColors.success, shape: BoxShape.circle),
                           ),
                           AppSpacing.gapH4,
-                          const Text('100ms Live Video Stream Active', style: TextStyle(fontSize: 10, color: Colors.greenAccent)),
+                          const Text('Agora Live Video Stream Active', style: TextStyle(fontSize: 10, color: Colors.greenAccent)),
                         ],
                       ),
                     ],
@@ -715,4 +741,3 @@ class _ActiveVideoCallScreenState extends State<ActiveVideoCallScreen> {
     );
   }
 }
-

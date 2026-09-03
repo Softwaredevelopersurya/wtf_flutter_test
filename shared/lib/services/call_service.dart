@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import '../models/models.dart';
+import '../utils/app_config.dart';
 import '../utils/formatters.dart';
 import '../utils/validators.dart';
 import 'chat_service.dart';
@@ -19,7 +20,7 @@ class CallService {
   final LogService _logger = LogService();
   final Uuid _uuid = const Uuid();
 
-  String tokenServerUrl = 'http://localhost:8080';
+  String get tokenServerUrl => AppConfig.tokenServerUrl;
 
   Stream<List<CallRequest>> get callRequestsStream => _sync.callRequestsStream;
   Stream<List<SessionLog>> get sessionLogsStream => _sync.sessionLogsStream;
@@ -70,14 +71,14 @@ class CallService {
   /// Trainer Approves Call Request
   Future<CallRequest> approveCallRequest(String requestId) async {
     final req = _sync.callRequests.firstWhere((r) => r.id == requestId);
-    final roomId = 'room_100ms_${_uuid.v4().substring(0, 8)}';
+    final roomId = AppConfig.agoraDefaultChannel;
 
     final updatedRequest = req.copyWith(
       status: CallRequestStatus.approved,
       roomId: roomId,
     );
 
-    _logger.logSchedule('Trainer approved call request $requestId, generated roomId: $roomId');
+    _logger.logSchedule('Trainer approved call request $requestId, generated Agora channel: $roomId');
     await _sync.updateCallRequest(updatedRequest);
 
     // Send system message into chat
@@ -86,7 +87,7 @@ class CallService {
       chatId: '${req.memberId}_${req.trainerId}',
       senderId: req.trainerId,
       receiverId: req.memberId,
-      text: 'Call approved for $timeStr',
+      text: 'Call approved for $timeStr (Agora Channel: $roomId)',
     );
 
     return updatedRequest;
@@ -114,39 +115,47 @@ class CallService {
     return updatedRequest;
   }
 
-  /// Fetch 100ms Auth Token from Token Server (with local fallback if server offline)
-  Future<String> fetch100msAuthToken({
+  /// Fetch Agora RTC Auth Token from Token Server (with local fallback if server offline)
+  Future<String> fetchAgoraToken({
     required String userId,
-    required String role,
-    required String roomId,
+    required String channelName,
+    int uid = 0,
+    String role = 'broadcaster',
   }) async {
-    _logger.logRtc('Fetching 100ms Auth Token for user=$userId, role=$role, room=$roomId');
+    _logger.logRtc('Fetching Agora RTC Token for user=$userId, role=$role, channel=$channelName, uid=$uid');
 
     try {
-      final uri = Uri.parse('$tokenServerUrl/token?userId=$userId&role=$role&roomId=$roomId');
+      final baseUrl = AppConfig.tokenServerUrl;
+      final uri = Uri.parse('$baseUrl/token?userId=$userId&role=$role&channelName=$channelName&roomId=$channelName&uid=$uid');
       final response = await http.get(uri).timeout(const Duration(seconds: 3));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body) as Map<String, dynamic>;
-        final token = data['token'] as String;
-        _logger.logRtc('Successfully obtained 100ms token from token_server');
-        return token;
+        final token = (data['token'] ?? data['rtcToken'] ?? '') as String;
+        if (token.isNotEmpty && token.startsWith('007')) {
+          _logger.logRtc('Successfully obtained Agora RTC token from token_server');
+          return token;
+        }
       }
     } catch (e) {
-      _logger.logRtc('Token server unreachable, generating robust local dev auth token', meta: {'error': e.toString()});
+      _logger.logRtc('Token server unreachable or returned error, using verified Agora temp token', meta: {'error': e.toString()});
     }
 
-    // Fallback: self-contained dev token for resilience
-    return 'dev_token_${role}_${roomId}_$userId';
+    // Fallback: Use verified live Agora Temp Token for wtf_flutter_test
+    return AppConfig.agoraTempToken;
   }
 
-  /// Checks if call is upcoming (within 10 minutes or past due today)
+  /// Backward compatibility helper delegating to fetchAgoraToken
+  Future<String> fetch100msAuthToken({
+    required String userId,
+    required String role,
+    required String roomId,
+  }) => fetchAgoraToken(userId: userId, channelName: roomId, role: role);
+
+
+  /// Checks if call is approved and joinable
   bool isCallJoinable(CallRequest request) {
-    if (request.status != CallRequestStatus.approved) return false;
-    final now = DateTime.now();
-    final difference = request.scheduledFor.difference(now);
-    // Allow join if within 10 minutes before, or started up to 45 mins ago
-    return difference.inMinutes <= 10 && difference.inMinutes >= -45;
+    return request.status == CallRequestStatus.approved;
   }
 
   /// Save completed session log

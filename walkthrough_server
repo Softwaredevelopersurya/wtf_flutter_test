@@ -1,0 +1,47 @@
+# Walkthrough - Production Vercel Deployment to `icrh`
+
+Successfully deployed the Agora RTC Token & Synchronization Server (`token_server`) to your **`icrh`** Vercel account ([https://vercel.com/icrh](https://vercel.com/icrh)).
+
+---
+
+## 1. Production Deployment Information
+
+- **Production Domain**: [https://tokenserver-tau.vercel.app](https://tokenserver-tau.vercel.app)
+- **Deployment URL**: [https://tokenserver-69oesl5d7-icrh.vercel.app](https://tokenserver-69oesl5d7-icrh.vercel.app)
+- **Vercel Dashboard Project**: [https://vercel.com/icrh/token_server](https://vercel.com/icrh/token_server)
+- **Inspect Console**: [https://vercel.com/icrh/token_server/ByfmCR5QgAQAHY6wU5Xbtvace5M8](https://vercel.com/icrh/token_server/ByfmCR5QgAQAHY6wU5Xbtvace5M8)
+
+---
+
+## 2. Live Cloud Endpoints
+
+| Endpoint | Method | Status | Purpose |
+| :--- | :--- | :--- | :--- |
+| `https://tokenserver-tau.vercel.app/health` | `GET` | `200 OK` | Server health check & Agora credentials status |
+| `https://tokenserver-tau.vercel.app/token` | `GET` | `200 OK` | Dynamic 24-hr Agora RTC v007 Token Generator |
+| `https://tokenserver-tau.vercel.app/api/sync` | `GET` | `200 OK` | Real-time cross-device state synchronization |
+| `https://tokenserver-tau.vercel.app/api/sync/message` | `POST` | `200 OK` | Global chat message broadcasting |
+| `https://tokenserver-tau.vercel.app/api/sync/user` | `POST` | `200 OK` | Member & Trainer registration |
+
+---
+
+## 3. Flutter Configuration
+
+In [app_config.dart](file:///e:/spy_projects/wtf_flutter_test/shared/lib/utils/app_config.dart#L4-L35), `AppConfig.remoteTokenServerUrl` is now set to `https://tokenserver-tau.vercel.app` by default:
+
+```dart
+class AppConfig {
+  static const String remoteTokenServerUrl = String.fromEnvironment(
+    'TOKEN_SERVER_URL',
+    defaultValue: 'https://tokenserver-tau.vercel.app',
+  );
+  ...
+}
+```
+
+### Running on Any Device
+Both **Guru App** and **Trainer App** now automatically connect to your production Vercel server when run on:
+- Chrome / Web browsers
+- Physical Android & iOS phones
+- Android & iOS Emulators
+- Windows & macOS Desktop

@@ -16,11 +16,14 @@ class _GuruChatScreenState extends State<GuruChatScreen> {
   final ScrollController _scrollController = ScrollController();
   bool _isSending = false;
 
+  int _previousMessageCount = 0;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<GuruViewModel>().markMessagesAsRead();
+      _scrollToBottom();
     });
   }
 
@@ -108,6 +111,10 @@ class _GuruChatScreenState extends State<GuruChatScreen> {
     final user = vm.currentUser;
     final trainer = vm.assignedTrainer;
     final messages = vm.messages;
+    if (messages.length != _previousMessageCount) {
+      _previousMessageCount = messages.length;
+      _scrollToBottom();
+    }
     final isTyping = vm.isTrainerTyping;
     final upcomingCall = vm.nextUpcomingApprovedCall;
 

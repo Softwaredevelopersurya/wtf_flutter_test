@@ -127,7 +127,17 @@ This document contains the complete ledger of AI prompts, tools, intents, genera
   ```dart
   class TrainerViewModel extends ChangeNotifier { ... }
   ```
-- **File Reference**: `trainer_app/lib/`
+### Entry #12: Agora RTC SDK & In-Call Messaging Migration
+- **Tool**: Gemini 3.7 Flash
+- **Intent**: Replace legacy 100ms SDK with `agora_rtc_engine` across all layers (service, UI, models, token server), supporting video conference, in-call data streams, and token auth.
+- **Output Snippet**:
+  ```dart
+  class AgoraSdkService {
+    Future<void> joinChannel({required String channelName, required String token, required int uid, required String userName}) async { ... }
+    Future<void> sendInCallMessage(String text) async { ... }
+  }
+  ```
+- **File Reference**: `shared/lib/services/agora_sdk_service.dart`, `shared/lib/widgets/video_call_view.dart`, `token_server/server.js`
 
 ---
 
@@ -160,3 +170,8 @@ This document contains the complete ledger of AI prompts, tools, intents, genera
 ### Refactor Entry #2: Centralized UI Copy Strings
 - **Before**: Hardcoded strings scattered across chat, scheduler, and dialog widgets.
 - **After**: Consolidated all exact UI copy specified in Section 11 of the assessment into `AppStrings` (`emptyChat`, `requestSent`, `callApproved`, `callDeclined`, `joinPrompt`, `sessionEnded`).
+
+### Refactor Entry #3: Complete 100ms to Agora RTC SDK Migration
+- **Before**: `HMSSdkService`, `HMSVideoView`, `hmssdk_flutter` dependency, and 100ms JWT token server.
+- **After**: `AgoraSdkService`, `AgoraVideoView`, `agora_rtc_engine: ^6.3.0`/`^6.5.x`, Agora RTC Data Streams for in-call messaging, and HMAC-SHA256 Agora RTC Access Token (v007) generator in `token_server/server.js`.
+

@@ -9,6 +9,7 @@ class TrainerViewModel extends ChangeNotifier {
   final SyncBridge _sync = SyncBridge();
 
   User? _currentUser;
+  User? _selectedMember;
   bool _isLoading = true;
 
   StreamSubscription? _messagesSub;
@@ -27,9 +28,38 @@ class TrainerViewModel extends ChangeNotifier {
     return list.isNotEmpty ? list.first : null;
   }
 
+  User? get activeMember {
+    if (_selectedMember != null) {
+      return members.firstWhere((m) => m.id == _selectedMember!.id, orElse: () => _selectedMember!);
+    }
+    // Pick member with most recent message or call request if available
+    if (_currentUser != null && _sync.messages.isNotEmpty) {
+      final lastMsg = _sync.messages.last;
+      final recentMemberId = lastMsg.senderId == _currentUser!.id ? lastMsg.receiverId : lastMsg.senderId;
+      final found = members.where((m) => m.id == recentMemberId);
+      if (found.isNotEmpty) return found.first;
+    }
+    return primaryMember;
+  }
+
+  void setSelectedMember(User? member) {
+    _selectedMember = member;
+    notifyListeners();
+  }
+
+  List<Message> getMessagesForMember(User member) {
+    if (_currentUser == null) return [];
+    return _chat.getMessagesForChat(
+      '${member.id}_${_currentUser!.id}',
+      user1Id: member.id,
+      user2Id: _currentUser!.id,
+    );
+  }
+
   List<Message> get messagesForPrimaryMember {
-    if (_currentUser == null || primaryMember == null) return [];
-    return _chat.getMessagesForChat('${primaryMember!.id}_${_currentUser!.id}');
+    final target = activeMember ?? primaryMember;
+    if (_currentUser == null || target == null) return [];
+    return getMessagesForMember(target);
   }
 
   List<CallRequest> get pendingRequests {
@@ -52,16 +82,33 @@ class TrainerViewModel extends ChangeNotifier {
   }
 
   int get unreadChatCount {
-    if (_currentUser == null || primaryMember == null) return 0;
+    final target = activeMember ?? primaryMember;
+    if (_currentUser == null || target == null) return 0;
+    return getUnreadCountForMember(target);
+  }
+
+  int getUnreadCountForMember(User member) {
+    if (_currentUser == null) return 0;
     return _chat.getUnreadCount(
-      chatId: '${primaryMember!.id}_${_currentUser!.id}',
+      chatId: '${member.id}_${_currentUser!.id}',
       currentUserId: _currentUser!.id,
+      otherUserId: member.id,
     );
   }
 
   Message? get lastChatMessage {
-    if (_currentUser == null || primaryMember == null) return null;
-    return _chat.getLastMessage('${primaryMember!.id}_${_currentUser!.id}');
+    final target = activeMember ?? primaryMember;
+    if (_currentUser == null || target == null) return null;
+    return getLastMessageForMember(target);
+  }
+
+  Message? getLastMessageForMember(User member) {
+    if (_currentUser == null) return null;
+    return _chat.getLastMessage(
+      '${member.id}_${_currentUser!.id}',
+      user1Id: member.id,
+      user2Id: _currentUser!.id,
+    );
   }
 
   CallRequest? get nextUpcomingApprovedCall {
@@ -94,23 +141,26 @@ class TrainerViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> sendMessage(String text, {String? attachmentUrl}) async {
-    if (_currentUser == null || primaryMember == null || text.trim().isEmpty) return;
+  Future<void> sendMessage(String text, {String? attachmentUrl, User? targetMember}) async {
+    final target = targetMember ?? activeMember ?? primaryMember;
+    if (_currentUser == null || target == null || text.trim().isEmpty) return;
 
     await _chat.sendMessage(
-      chatId: '${primaryMember!.id}_${_currentUser!.id}',
+      chatId: '${target.id}_${_currentUser!.id}',
       senderId: _currentUser!.id,
-      receiverId: primaryMember!.id,
+      receiverId: target.id,
       text: text.trim(),
       attachmentUrl: attachmentUrl,
     );
   }
 
-  Future<void> markMessagesAsRead() async {
-    if (_currentUser == null || primaryMember == null) return;
+  Future<void> markMessagesAsRead({User? targetMember}) async {
+    final target = targetMember ?? activeMember ?? primaryMember;
+    if (_currentUser == null || target == null) return;
     await _chat.markAsRead(
-      chatId: '${primaryMember!.id}_${_currentUser!.id}',
+      chatId: '${target.id}_${_currentUser!.id}',
       currentUserId: _currentUser!.id,
+      otherUserId: target.id,
     );
   }
 

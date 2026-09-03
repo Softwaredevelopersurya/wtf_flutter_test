@@ -3,7 +3,7 @@
 ## ADR #1: State Management Strategy — Provider & MVVM Pattern
 
 ### Context
-The assessment requires building two interconnected Flutter applications (`guru_app` and `trainer_app`) that coordinate state across authentication, real-time chat, call scheduling, video conferencing, and session logs with high readability, testability, and zero boilerplate friction.
+The project requires building two interconnected Flutter applications (`guru_app` and `trainer_app`) that coordinate state across authentication, real-time chat, call scheduling, video conferencing, and session logs with high readability, testability, and zero boilerplate friction.
 
 ### Decision
 We chose the **MVVM (Model-View-ViewModel) pattern with `Provider` (`ChangeNotifier`)** layered with domain repositories and reactive streams.
@@ -14,7 +14,7 @@ We chose the **MVVM (Model-View-ViewModel) pattern with `Provider` (`ChangeNotif
 ### Consequences
 - **Pros**:
   - Direct alignment with the official Flutter Architecture best practices.
-  - Zero code generation overhead (unlike Freezed/Riverpod codegen steps), ensuring fast builds and rapid iteration.
+  - Zero code generation overhead, ensuring fast builds and rapid iteration.
   - Clean separation of UI logic and business logic enabling isolated unit tests.
 - **Cons**: Requires explicit manual listener subscriptions and disposal hygiene, which we encapsulated inside view models.
 
@@ -40,20 +40,21 @@ We implemented a local-first **`SyncBridge` architecture**:
 
 ---
 
-## ADR #3: 100ms Real-Time Video RTC Strategy & Resilience
+## ADR #3: Video Calling & RTC Engine Strategy — Migration to Agora RTC SDK
 
 ### Context
-Video calls must strictly adhere to 100ms RTC specifications, enforce role separation (`trainer` as host vs `member` as participant), provide pre-join device verification, handle network degradation gracefully, and write session logs on completion.
+The project requires video calling and real-time in-call messaging with camera/microphone hardware toggling, front/rear camera flipping, dynamic channel creation, network glitch resilience, and token generation.
 
 ### Decision
-1. **100ms Token Server**: A dedicated Node.js service (`token_server/`) mints valid 100ms JWT auth tokens signed with `HMS_APP_ACCESS_KEY` and `HMS_APP_SECRET`.
-2. **Device Pre-Flight Check**: Pre-join modal validates camera and mic hardware before room entry.
-3. **Role-Enforced In-Call Controls**:
-   - Trainer (Host): Full audio/video control, camera flipping, and authority to end call for all participants.
-   - Member: Audio/video controls with participant-only leave permissions.
-4. **Network Resilience & Fault Tolerance**: Auto-reconnect handling with overlay feedback during simulated or real network blips.
-5. **Session Telemetry**: Automatically records start, end, and duration into `SessionLog` on call termination, followed by role-specific post-call feedback sheets.
+We migrated from 100ms SDK to the **Agora RTC Engine SDK (`agora_rtc_engine: ^6.3.0` / `^6.5.x`)**:
+1. **Agora SDK Service (`AgoraSdkService`)**: Encapsulates `RtcEngine` lifecycle, channel joining (`joinChannel`), event handler registration (`onJoinChannelSuccess`, `onUserJoined`, `onUserOffline`, `onUserMuteVideo`, `onConnectionStateChanged`, `onStreamMessage`), local/remote peer state broadcasts, and hardware controls.
+2. **In-Call Real-Time Messaging**: Uses Agora RTC Data Streams (`createDataStream` & `sendStreamMessage`) to deliver sub-second in-call messages between trainer and member with full reactive stream updates.
+3. **Agora Token Server**: Generates HMAC-SHA256 Agora RTC Access Tokens v007 signed with `AGORA_APP_ID` and `AGORA_APP_CERTIFICATE` with a 24-hour expiration window and local fallback resilience.
+4. **Rendering & DX**: Employs `AgoraVideoView` with `VideoViewController` for local and remote streams alongside high-fidelity fallback avatars for test environments.
 
 ### Consequences
-- **Pros**: Full compliance with 100ms protocol and assessment rubric (25 points).
-- **Cons**: Requires running `token_server` or using the built-in development fallback token generator.
+- **Pros**:
+  - World-class low-latency audio/video communication backed by Agora's Software Defined Real-time Network (SD-RTN).
+  - Built-in data streams for in-call messaging without requiring a separate signaling service.
+  - Full compatibility across mobile, desktop, and web preview targets.
+- **Cons**: Requires Agora App ID configuration (provided in `.env` / `AppConfig` with resilient dev token fallback).
